@@ -34,6 +34,10 @@ function Navbar({ user, onLogout }) {
               <span>🔗</span>
             </div>
             JobConnect SA
+<<<<<<< HEAD
+=======
+            <span>🤝</span>
+>>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
           </Link>
           
 

@@ -74,13 +74,21 @@ function WorkerDashboard({ user, onLogout }) {
           <div className="welcome-left">
             <div className="welcome-avatar">👷</div>
             <div className="welcome-text">
+<<<<<<< HEAD
               <h2>Welcome back, {user.name.split(' ')[0]}! </h2>
+=======
+              <h2>Welcome back, {user.name.split(' ')[0]}! 👋</h2>
+>>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
               <p>Here are your latest job recommendations</p>
             </div>
           </div>
           <div className="welcome-right">
             {user.verified ? (
+<<<<<<< HEAD
               <div className="verified-banner">ID Verified</div>
+=======
+              <div className="verified-banner">✅ ID Verified</div>
+>>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
             ) : (
               <div
                 className="not-verified-banner"

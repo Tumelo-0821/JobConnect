@@ -10,7 +10,11 @@ function Footer() {
         <div className="footer-brand">
           <div className="footer-logo">
             <span>🔗</span>
+<<<<<<< HEAD
             JobConnect SA
+=======
+            WorkConnect SA
+>>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
           </div>
           <p>
             Connecting informal workers with trusted employers across South Africa.
@@ -18,8 +22,13 @@ function Footer() {
           </p>
           <div className="footer-badges">
             <span>🇿🇦 South Africa</span>
+<<<<<<< HEAD
             <span>Verified Workers</span>
             <span>Safe Platform</span>
+=======
+            <span>✅ Verified Workers</span>
+            <span>🔒 Safe Platform</span>
+>>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
           </div>
         </div>
 
@@ -59,7 +68,11 @@ function Footer() {
 
       {/* Bottom bar */}
       <div className="footer-bottom">
+<<<<<<< HEAD
         <p>© 2024 JobConnect SA. All rights reserved.</p>
+=======
+        <p>© 2024 WorkConnect SA. All rights reserved.</p>
+>>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
         <div className="footer-bottom-links">
           <Link to="/terms">Terms of Service</Link>
           <Link to="/privacy">Privacy</Link>
