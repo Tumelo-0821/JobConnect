@@ -136,7 +136,7 @@ function PostJobPage({ user, onLogout }) {
                     <option>1 Day</option>
                     <option>2-3 Days</option>
                     <option>1 Week</option>
-                    <option>Ongoing / Regular</option>
+                    <option>Monthly</option>
                   </select>
                 </div>
               </div>
