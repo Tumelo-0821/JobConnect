@@ -5,11 +5,7 @@
   left: 0;
   right: 0;
   height: 70px;
-<<<<<<< HEAD
   background:#151b54;
-=======
-  background: white;
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
   box-shadow: 0 2px 10px rgba(0,0,0,0.08);
   z-index: 1000;
   display: flex;
@@ -55,11 +51,7 @@
 }
 
 .navbar-links a {
-<<<<<<< HEAD
   color: white;
-=======
-  color: var(--text);
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
   font-weight: 600;
   font-size: 0.95rem;
   transition: color 0.2s;
@@ -92,12 +84,7 @@
 }
 
 .nav-register-btn {
-<<<<<<< HEAD
   background: var(--primary);
-=======
-  background: var(--secondary);
-  color: white;
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
   font-weight: 700;
   font-size: 0.95rem;
   padding: 8px 20px;
@@ -106,15 +93,11 @@
 }
 
 .nav-register-btn:hover {
-<<<<<<< HEAD
   background: transparent;
   color: white;
   border-radius: var(--radius-sm);
   border: 2px solid var(--primary);
   transition: all 0.2s;
-=======
-  background: var(--secondary-dark);
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
 }
 
 /* Hamburger menu (mobile) */
@@ -243,11 +226,7 @@
 }
 
 .nav-logout-btn:hover {
-<<<<<<< HEAD
   background:rgba(255,255,255,0.1);
-=======
-  background: #fecaca;
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
 }
 
 @media (max-width: 768px) {
