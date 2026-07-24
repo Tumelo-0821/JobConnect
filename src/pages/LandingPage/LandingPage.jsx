@@ -10,7 +10,6 @@ function LandingPage({ user, onLogout }) {
 
   // Job categories available on the platform
   const categories = [
-<<<<<<< HEAD
     { name: 'Construction', count: '1,200+ workers' },
     { name: 'Cleaning', count: '850+ workers' },
     { name: 'Gardening', count: '620+ workers' },
@@ -19,16 +18,6 @@ function LandingPage({ user, onLogout }) {
     { name: 'Painting', count: '510+ workers' },
     { name: 'Driving', count: '740+ workers' },
     { name: 'Childcare', count: '290+ workers' },
-=======
-    { icon: '🔨', name: 'Construction', count: '1,200+ workers' },
-    { icon: '🧹', name: 'Cleaning', count: '850+ workers' },
-    { icon: '🌿', name: 'Gardening', count: '620+ workers' },
-    { icon: '🔌', name: 'Electrical', count: '430+ workers' },
-    { icon: '🚿', name: 'Plumbing', count: '380+ workers' },
-    { icon: '🎨', name: 'Painting', count: '510+ workers' },
-    { icon: '🚗', name: 'Driving', count: '740+ workers' },
-    { icon: '👶', name: 'Childcare', count: '290+ workers' },
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
   ];
 
   // Fake testimonials to show on the page
@@ -36,35 +25,19 @@ function LandingPage({ user, onLogout }) {
     {
       name: 'Sipho Dlamini',
       role: 'Construction Worker, Soweto',
-<<<<<<< HEAD
-=======
-      avatar: '👷',
-      avatarBg: '#e8f1fb',
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
       stars: '★★★★★',
       text: 'WorkConnect changed my life! I found 5 jobs in my first month. The app is easy to use even for me who is not good with phones.',
     },
     {
       name: 'Fatima Meyer',
       role: 'Employer, Cape Town',
-<<<<<<< HEAD
-=======
-      avatar: '👩‍💼',
-      avatarBg: '#e8f8f0',
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
       stars: '★★★★★',
       text: 'I found a reliable cleaner within 2 days. The verification system gives me peace of mind. I can see their ID and background check.',
     },
     {
       name: 'Thabo Nkosi',
       role: 'Electrician, Durban',
-<<<<<<< HEAD
       stars: '★★★★★',
-=======
-      avatar: '⚡',
-      avatarBg: '#fff8e8',
-      stars: '★★★★⭐',
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
       text: 'Before WorkConnect I was struggling. Now I have regular clients. The payment system is safe and I always get paid on time.',
     },
   ];
@@ -77,12 +50,6 @@ function LandingPage({ user, onLogout }) {
       <section className="hero">
         <div className="hero-content">
           <div className="hero-text">
-<<<<<<< HEAD
-=======
-            <div className="badge">
-              🇿🇦 Proudly South African Platform
-            </div>
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
             <h1>
               Find <span>Trusted Workers</span> Near You
             </h1>
@@ -97,21 +64,13 @@ function LandingPage({ user, onLogout }) {
                 className="hero-btn-main"
                 onClick={() => navigate('/register?role=employer')}
               >
-<<<<<<< HEAD
                 Hire a Worker
-=======
-                🏗️ Hire a Worker
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
               </button>
               <button
                 className="hero-btn-outline"
                 onClick={() => navigate('/register?role=worker')}
               >
-<<<<<<< HEAD
                 Find Work
-=======
-                💼 Find Work
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
               </button>
             </div>
 
@@ -138,16 +97,9 @@ function LandingPage({ user, onLogout }) {
               {/* Card 1 - main card */}
               <div className="hero-worker-card card-1">
                 <div className="worker-card-header">
-<<<<<<< HEAD
                   <div className="worker-card-info">
                     <h3>Sipho M.</h3>
                     <p>Johannesburg, GP</p>
-=======
-                  <div className="worker-card-avatar">👷</div>
-                  <div className="worker-card-info">
-                    <h3>Sipho M.</h3>
-                    <p>📍 Johannesburg, GP</p>
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
                   </div>
                 </div>
                 <div className="worker-card-skills">
@@ -165,13 +117,6 @@ function LandingPage({ user, onLogout }) {
                   <span className="badge-verified">✓ Verified</span>
                 </div>
               </div>
-<<<<<<< HEAD
-=======
-
-              {/* Background cards (decorative) */}
-              <div className="hero-worker-card card-2"></div>
-              <div className="hero-worker-card card-3"></div>
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
             </div>
           </div>
         </div>
@@ -190,10 +135,6 @@ function LandingPage({ user, onLogout }) {
             {/* Step 1 */}
             <div className="step-card">
               <div className="step-icon">
-<<<<<<< HEAD
-=======
-                <span>📝</span>
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
                 <div className="step-number">1</div>
               </div>
               <h3>Create Your Account</h3>
@@ -206,10 +147,6 @@ function LandingPage({ user, onLogout }) {
             {/* Step 2 */}
             <div className="step-card">
               <div className="step-icon">
-<<<<<<< HEAD
-=======
-                <span>🔍</span>
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
                 <div className="step-number">2</div>
               </div>
               <h3>Find Work or Workers</h3>
@@ -222,10 +159,6 @@ function LandingPage({ user, onLogout }) {
             {/* Step 3 */}
             <div className="step-card">
               <div className="step-icon">
-<<<<<<< HEAD
-=======
-                <span>✅</span>
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
                 <div className="step-number">3</div>
               </div>
               <h3>Get Hired or Hire</h3>
@@ -236,11 +169,8 @@ function LandingPage({ user, onLogout }) {
             </div>
           </div>
         </div>
-<<<<<<< HEAD
 
         
-=======
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
       </section>
 
       {/* ===== JOB CATEGORIES ===== */}
@@ -308,7 +238,6 @@ function LandingPage({ user, onLogout }) {
 
         <div className="trust-indicators">
           <div className="trust-item">
-<<<<<<< HEAD
             <span className="label">ID Verified</span>
           </div>
           <div className="trust-item">
@@ -321,25 +250,6 @@ function LandingPage({ user, onLogout }) {
             <span className="label">Direct Chat</span>
           </div>
           <div className="trust-item">
-=======
-            <span className="icon">🔒</span>
-            <span className="label">ID Verified</span>
-          </div>
-          <div className="trust-item">
-            <span className="icon">⭐</span>
-            <span className="label">Rated Workers</span>
-          </div>
-          <div className="trust-item">
-            <span className="icon">📍</span>
-            <span className="label">Near You</span>
-          </div>
-          <div className="trust-item">
-            <span className="icon">💬</span>
-            <span className="label">Direct Chat</span>
-          </div>
-          <div className="trust-item">
-            <span className="icon">💰</span>
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
             <span className="label">Safe Payment</span>
           </div>
         </div>
@@ -349,21 +259,13 @@ function LandingPage({ user, onLogout }) {
             className="cta-btn-white"
             onClick={() => navigate('/register?role=employer')}
           >
-<<<<<<< HEAD
             I Need a Worker
-=======
-            🏗️ I Need a Worker
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
           </button>
           <button
             className="cta-btn-transparent"
             onClick={() => navigate('/register?role=worker')}
           >
-<<<<<<< HEAD
             I Want to Work
-=======
-            💼 I Want to Work
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
           </button>
         </div>
       </section>
@@ -371,10 +273,6 @@ function LandingPage({ user, onLogout }) {
       <Footer />
     </div>
   );
-<<<<<<< HEAD
-
-=======
->>>>>>> f5b8851420f97d11823ac5b15619439c9a1dc79e
 }
 
 export default LandingPage;
