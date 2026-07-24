@@ -133,6 +133,7 @@
   font-size: 0.88rem;
   font-weight: 700;
   color: #6b7280;
+  
 }
 
 .urgency-option:hover {
@@ -154,7 +155,7 @@
 /* Submit button */
 .submit-job-btn {
   width: 100%;
-  background: #27ae60;
+  background: #151b54;
   color: white;
   border: none;
   padding: 16px;
@@ -172,7 +173,7 @@
 }
 
 .submit-job-btn:hover {
-  background: #219a52;
+  background: #2b3ddb;
   transform: translateY(-1px);
   box-shadow: 0 4px 14px rgba(39,174,96,0.3);
 }

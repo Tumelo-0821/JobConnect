@@ -1,3 +1,7 @@
+
+* {
+  box-sizing: border-box;
+}
 /* Employer Dashboard CSS */
 
 .emp-dashboard-page {
@@ -16,13 +20,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(135deg, #27ae60 0%, #1a7a44 100%);
+  background: linear-gradient(135deg, #151b54 0%, #151b54 100%);
   color: white;
   border-radius: 20px;
   padding: 28px 32px;
   margin-bottom: 28px;
   flex-wrap: wrap;
   gap: 16px;
+  margin-top: 10px;
 }
 
 .emp-welcome-left {
@@ -57,7 +62,7 @@
 
 .post-job-btn {
   background: white;
-  color: #27ae60;
+  color: #151b54;
   border: none;
   padding: 12px 24px;
   border-radius: 12px;
@@ -76,9 +81,16 @@
 }
 
 /* Stats */
+/*
 .emp-stats-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}*/
+.emp-stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 16px;
   margin-bottom: 28px;
 }
@@ -248,6 +260,7 @@
   border-radius: 12px;
   margin-bottom: 10px;
   transition: all 0.2s;
+  flex-wrap: wrap;
 }
 
 .worker-result-card:last-child {
@@ -263,7 +276,7 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #1a6fc4, #27ae60);
+  background: linear-gradient(135deg, #1a6fc4, #475dda);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -286,7 +299,7 @@
 
 .worker-result-skill {
   font-size: 0.78rem;
-  color: #6b7280;
+  color: #5c6069;
   margin-top: 2px;
 }
 
@@ -295,17 +308,18 @@
   gap: 10px;
   margin-top: 6px;
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: #616468;
 }
 
 .worker-result-actions {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  flex-shrink: 0;
 }
 
 .hire-btn {
-  background: #27ae60;
+  background: #198546;
   color: white;
   border: none;
   padding: 7px 14px;
@@ -321,8 +335,9 @@
 .hire-btn:disabled { background: #9ca3af; cursor: not-allowed; }
 
 .shortlist-btn {
-  background: #fff8e8;
-  color: #f39c12;
+  background: #aa6b06;
+  /*#12115c*/
+  color: white;
   border: none;
   padding: 7px 14px;
   border-radius: 8px;
@@ -436,10 +451,128 @@
 }
 
 @media (max-width: 768px) {
-  .emp-dashboard-page {
+  /*.emp-dashboard-page {
     padding: 76px 12px 30px;
   }
   .emp-welcome {
     padding: 20px;
+  }*/
+  /*neew emp
+   .emp-dashboard-page{
+    padding:70px 10px 20px;
   }
+
+  .emp-welcome{
+    flex-direction:column;
+    align-items:flex-start;
+    padding:20px;
+  }
+
+  .emp-welcome-left{
+    width:100%;
+  }
+
+  .post-job-btn{
+    width:100%;
+    justify-content:center;
+  }*/
+
+  .emp-dashboard-page{
+    padding:70px 10px 20px;
+  }
+
+  .emp-stats-row{
+    grid-template-columns: 1fr;
+  }
+
+  .emp-dashboard-grid{
+    grid-template-columns:1fr;
+  }
+
+  .emp-welcome{
+    flex-direction:column;
+    text-align:center;
+    padding:20px;
+   align-items:center;
+   margin-top: 10px;
+    
+   
+  }
+
+  .emp-welcome-left{
+    flex-direction:column;
+   
+  }
+
+  .post-job-btn{
+    width:100%;
+    justify-content:center;
+  }
+
+
+  .search-bar{
+    flex-direction:column;
+  }
+
+  .search-bar input,
+  .search-bar select,
+  .search-bar button{
+    width:100%;
+  }
+
+  .worker-result-card{
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+  }
+
+  .worker-result-info{
+    width:100%;
+  }
+
+  .worker-result-name,
+  .worker-result-meta{
+    justify-content:center;
+  }
+
+  .worker-result-actions{
+    width:100%;
+    flex-direction:row;
+    justify-content:center;
+    margin-top:10px;
+  }
+
+  .hire-btn,
+  .shortlist-btn{
+    flex:1;
+    max-width:140px;
+  }
+  /*neww style*/
+  .worker-result-card {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.worker-result-info {
+  width: 100%;
+}
+
+.worker-result-name,
+.worker-result-meta {
+  justify-content: center;
+}
+
+.worker-result-actions {
+  width: 100%;
+  flex-direction: row;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.hire-btn,
+.shortlist-btn {
+  flex: 1;
+  max-width: 140px;
+}
 }

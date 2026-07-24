@@ -3,6 +3,30 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar/Navbar';
 import './EmployerDashboard.css';
 import '../WorkerDashboard/WorkerDashboard.css';
+import {
+  FaHome,
+  FaClipboardList,
+  FaSearch,
+  FaBriefcase,
+  FaUser,
+  FaUsers,
+  FaMapMarkerAlt,
+  FaMapMarker,
+  FaPhone,
+  FaEnvelope,
+  FaCalendarAlt,
+  FaBell,
+  FaCog,
+  FaCheckCircle,
+  FaClock,
+  FaMoneyBillWave,
+  FaStar,
+  FaCamera,
+  FaIdCard,
+  FaHandPaper,
+  FaComments,
+  FaSignOutAlt
+} from "react-icons/fa";
 
 // Fake data for the employer dashboard
 const POSTED_JOBS = [
@@ -99,28 +123,28 @@ function EmployerDashboard({ user, onLogout }) {
         {/* Stats row */}
         <div className="emp-stats-row stats-row">
           <div className="stat-card">
-            <div className="stat-icon green">📋</div>
+            <div className="stat-icon green"><FaClipboardList/></div>
             <div>
               <div className="stat-value">3</div>
               <div className="stat-label">Jobs Posted</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon blue">👥</div>
+            <div className="stat-icon blue"><FaUsers /></div>
             <div>
               <div className="stat-value">22</div>
               <div className="stat-label">Applications</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon orange">⭐</div>
+            <div className="stat-icon orange"><FaStar/></div>
             <div>
               <div className="stat-value">{shortlisted.length}</div>
               <div className="stat-label">Shortlisted</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon yellow">✅</div>
+            <div className="stat-icon yellow"><FaCheckCircle/></div>
             <div>
               <div className="stat-value">{hired.length}</div>
               <div className="stat-label">Hired</div>
@@ -151,9 +175,9 @@ function EmployerDashboard({ user, onLogout }) {
                   <div className="posted-job-info">
                     <div className="job-title">{job.title}</div>
                     <div className="job-meta-small">
-                      <span>📍 {job.location}</span>
-                      <span>💰 {job.pay}</span>
-                      <span>👥 {job.applications} applications</span>
+                      <span><FaMapMarker/> {job.location}</span>
+                      <span><FaMoneyBillWave/> {job.pay}</span>
+                      <span><FaUsers/> {job.applications} applications</span>
                       <span className={`status-badge ${job.status === 'open' ? 'approved' : 'rejected'}`}>
                         {job.status === 'open' ? '🟢 Open' : '🔴 Closed'}
                       </span>
@@ -196,7 +220,7 @@ function EmployerDashboard({ user, onLogout }) {
               {/* Worker results */}
               {filteredWorkers.map(worker => (
                 <div key={worker.id} className="worker-result-card">
-                  <div className="worker-result-avatar">{worker.emoji}</div>
+                  <div className="worker-result-avatar">{/*worker.emoji*/}</div>
                   <div className="worker-result-info">
                     <div className="worker-result-name">
                       {worker.name}
@@ -204,7 +228,7 @@ function EmployerDashboard({ user, onLogout }) {
                     </div>
                     <div className="worker-result-skill">{worker.skill}</div>
                     <div className="worker-result-meta">
-                      <span>📍 {worker.location}</span>
+                      <span> <FaMapMarker/>{worker.location}</span>
                       <span>⭐ {worker.rating} ({worker.reviews} reviews)</span>
                     </div>
                   </div>
@@ -214,13 +238,14 @@ function EmployerDashboard({ user, onLogout }) {
                       onClick={() => handleHire(worker.id)}
                       disabled={hired.includes(worker.id)}
                     >
-                      {hired.includes(worker.id) ? '✅ Hired' : '✋ Hire'}
+                      {hired.includes(worker.id) ? ('✅ Hired') :( <><FaHandPaper/> Hire</>)}
                     </button>
                     <button
                       className="shortlist-btn"
                       onClick={() => toggleShortlist(worker.id)}
                     >
-                      {shortlisted.includes(worker.id) ? '⭐ Saved' : '🔖 Save'}
+                      {shortlisted.includes(worker.id) ? <FaStar/> + ' Saved' : ' Save'}
+                      {/*🔖*/}
                     </button>
                   </div>
                 </div>
@@ -231,7 +256,7 @@ function EmployerDashboard({ user, onLogout }) {
           {/* RIGHT COLUMN - Shortlist */}
           <div className="emp-right">
             <div className="shortlist-card">
-              <h3>⭐ Shortlisted Workers ({shortlistedWorkers.length})</h3>
+              <h3><FaStar/> Shortlisted Workers ({shortlistedWorkers.length})</h3>
 
               {shortlistedWorkers.length === 0 ? (
                 <p style={{ color: '#9ca3af', fontSize: '0.85rem', textAlign: 'center', padding: '20px 0' }}>
@@ -261,10 +286,10 @@ function EmployerDashboard({ user, onLogout }) {
             <div className="section-card">
               <h3 style={{ marginBottom: '14px' }}>💡 Quick Tips</h3>
               {[
-                { icon: '✅', tip: 'Always hire verified workers for safety' },
-                { icon: '💬', tip: 'Chat before hiring to discuss the job' },
-                { icon: '⭐', tip: 'Leave a review after the job is done' },
-                { icon: '📍', tip: 'Filter by location for nearby workers' },
+                { icon: <FaCheckCircle />, tip: 'Always hire verified workers for safety' },
+                { icon: <FaComments />, tip: 'Chat before hiring to discuss the job' },
+                { icon: <FaStar/>, tip: 'Leave a review after the job is done' },
+                { icon: <FaMapMarker/>, tip: 'Filter by location for nearby workers' },
               ].map((item, i) => (
                 <div key={i} style={{
                   display: 'flex', gap: '10px', alignItems: 'flex-start',

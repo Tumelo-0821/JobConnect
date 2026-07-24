@@ -186,7 +186,7 @@ function PostJobPage({ user, onLogout }) {
               </div>
 
               <button type="submit" className="submit-job-btn">
-                📢 Post This Job
+                Post This Job
               </button>
             </form>
           </div>

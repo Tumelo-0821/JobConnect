@@ -2,6 +2,31 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar/Navbar';
 import './WorkerDashboard.css';
+import {
+  FaHome,
+  FaClipboardList,
+  FaSearch,
+  FaBriefcase,
+  FaUser,
+  FaEdit,
+  FaUsers,
+  FaMapMarkerAlt,
+  FaMapMarker,
+  FaPhone,
+  FaEnvelope,
+  FaCalendarAlt,
+  FaBell,
+  FaCog,
+  FaCheckCircle,
+  FaClock,
+  FaMoneyBillWave,
+  FaStar,
+  FaCamera,
+  FaIdCard,
+  FaHandPaper,
+  FaComments,
+  FaSignOutAlt
+} from "react-icons/fa";
 
 // Fake job data to show in the dashboard
 const RECOMMENDED_JOBS = [
@@ -72,7 +97,7 @@ function WorkerDashboard({ user, onLogout }) {
         {/* Welcome banner */}
         <div className="dashboard-welcome">
           <div className="welcome-left">
-            <div className="welcome-avatar">👷</div>
+            <div className="welcome-avatar"></div>
             <div className="welcome-text">
               <h2>Welcome back, {user.name.split(' ')[0]}! </h2>
               <p>Here are your latest job recommendations</p>
@@ -95,28 +120,28 @@ function WorkerDashboard({ user, onLogout }) {
         {/* Stats row */}
         <div className="stats-row">
           <div className="stat-card">
-            <div className="stat-icon blue">💼</div>
+            <div className="stat-icon blue"><FaBriefcase/></div>
             <div>
               <div className="stat-value">12</div>
               <div className="stat-label">Jobs Available</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon green">✅</div>
+            <div className="stat-icon green"><FaCheckCircle/></div>
             <div>
               <div className="stat-value">{appliedIds.length + 3}</div>
               <div className="stat-label">Applied</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon orange">⭐</div>
+            <div className="stat-icon orange"><FaStar/></div>
             <div>
               <div className="stat-value">4.8</div>
               <div className="stat-label">My Rating</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon yellow">💰</div>
+            <div className="stat-icon yellow"><FaMoneyBillWave/></div>
             <div>
               <div className="stat-value">R2,400</div>
               <div className="stat-label">This Month</div>
@@ -132,10 +157,10 @@ function WorkerDashboard({ user, onLogout }) {
 
             {/* Profile card */}
             <div className="profile-card">
-              <div className="profile-photo">👷</div>
+              <div className="profile-photo"></div>
               <div className="profile-name">{user.name}</div>
               <div className="profile-title">Construction & Tiling</div>
-              <div className="profile-location">📍 Soweto, Gauteng</div>
+              <div className="profile-location"> < FaMapMarkerAlt/>Soweto, Gauteng</div>
               <div className="profile-rating">
                 <span className="rating-stars">★★★★★</span>
                 <span className="rating-value">4.8</span>
@@ -152,7 +177,7 @@ function WorkerDashboard({ user, onLogout }) {
                   </span>
                 ))}
               </div>
-              <button className="edit-profile-btn">✏️ Edit Profile</button>
+              <button className="edit-profile-btn">{/*✏️*/} <FaEdit style={{ marginRight: "10px" }}/>Edit Profile</button>
             </div>
 
             {/* Profile completion */}
@@ -205,8 +230,8 @@ function WorkerDashboard({ user, onLogout }) {
                     </span>
                   </div>
                   <div className="job-meta">
-                    <span className="job-meta-item">📍 {job.location}</span>
-                    <span className="job-meta-item">💰 {job.pay}</span>
+                    <span className="job-meta-item">< FaMapMarkerAlt/> {job.location}</span>
+                    <span className="job-meta-item"><FaMoneyBillWave/> {job.pay}</span>
                     <span className="job-meta-item">🕐 {job.type}</span>
                   </div>
                   <div className="job-card-actions">
@@ -219,7 +244,7 @@ function WorkerDashboard({ user, onLogout }) {
                       {appliedIds.includes(job.id)
                         ? '✅ Applied'
                         : user.verified
-                        ? '✋ Apply Now'
+                        ?(<> <FaHandPaper/>  Apply Now </>)
                         : '🔒 Verify ID to Apply'}
                     </button>
                     <button className="save-btn">🔖 Save</button>
@@ -231,7 +256,7 @@ function WorkerDashboard({ user, onLogout }) {
             {/* Applied jobs */}
             <div className="section-card">
               <div className="section-card-header">
-                <h3>📋 My Applications</h3>
+                <h3><FaClipboardList/> My Applications</h3>
                 <button className="see-all-btn">See all</button>
               </div>
 
