@@ -10,35 +10,40 @@ function LandingPage({ user, onLogout }) {
 
   // Job categories available on the platform
   const categories = [
-    { name: 'Construction', count: '1,200+ workers' },
-    { name: 'Cleaning', count: '850+ workers' },
-    { name: 'Gardening', count: '620+ workers' },
-    { name: 'Electrical', count: '430+ workers' },
-    { name: 'Plumbing', count: '380+ workers' },
-    { name: 'Painting', count: '510+ workers' },
-    { name: 'Driving', count: '740+ workers' },
-    { name: 'Childcare', count: '290+ workers' },
+    { name: 'Construction', count: '1,200+ workers', icon: '🏗️' },
+    { name: 'Cleaning', count: '850+ workers', icon: '🧹' },
+    { name: 'Gardening', count: '620+ workers', icon: '🌿' },
+    { name: 'Electrical', count: '430+ workers', icon: '⚡' },
+    { name: 'Plumbing', count: '380+ workers', icon: '🔧' },
+    { name: 'Painting', count: '510+ workers', icon: '🎨' },
+    { name: 'Driving', count: '740+ workers', icon: '🚗' },
+    { name: 'Childcare', count: '290+ workers', icon: '👶' },
   ];
 
-  // Fake testimonials to show on the page
   const testimonials = [
     {
       name: 'Sipho Dlamini',
       role: 'Construction Worker, Soweto',
       stars: '★★★★★',
-      text: 'WorkConnect changed my life! I found 5 jobs in my first month. The app is easy to use even for me who is not good with phones.',
+      avatar: 'S',
+      avatarBg: '#1a6fc4',
+      text: 'JobConnect changed my life! I found 5 jobs in my first month. The app is easy to use even for me who is not good with phones.',
     },
     {
       name: 'Fatima Meyer',
       role: 'Employer, Cape Town',
       stars: '★★★★★',
+      avatar: 'F',
+      avatarBg: '#e85d04',
       text: 'I found a reliable cleaner within 2 days. The verification system gives me peace of mind. I can see their ID and background check.',
     },
     {
       name: 'Thabo Nkosi',
       role: 'Electrician, Durban',
       stars: '★★★★★',
-      text: 'Before WorkConnect I was struggling. Now I have regular clients. The payment system is safe and I always get paid on time.',
+      avatar: 'T',
+      avatarBg: '#2d6a4f',
+      text: 'Before JobConnect I was struggling. Now I have regular clients. The payment system is safe and I always get paid on time.',
     },
   ];
 
@@ -203,7 +208,7 @@ function LandingPage({ user, onLogout }) {
         <div className="container">
           <div className="section-header">
             <div className="section-tag">Real Stories</div>
-            <h2>People love WorkConnect SA</h2>
+            <h2>People love JobConnect SA</h2>
             <p>Hear from workers and employers who changed their lives</p>
           </div>
 
@@ -234,7 +239,7 @@ function LandingPage({ user, onLogout }) {
       {/* ===== TRUST / CTA SECTION ===== */}
       <section className="trust-section">
         <h2>Ready to get started?</h2>
-        <p>Join thousands of South Africans already using WorkConnect SA</p>
+        <p>Join thousands of South Africans already using JobConnect SA</p>
 
         <div className="trust-indicators">
           <div className="trust-item">

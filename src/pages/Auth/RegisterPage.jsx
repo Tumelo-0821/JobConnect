@@ -1,37 +1,38 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { api } from '../../services/api';
 import './Auth.css';
 
 function RegisterPage({ onLogin }) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // If someone clicked "Hire a Worker" on landing page, default to employer
   const defaultRole = searchParams.get('role') || 'worker';
 
   const [role, setRole] = useState(defaultRole);
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    city: '',
-    password: '',
-  });
+ const [formData, setFormData] = useState({
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  city: '',
+  idNumber: '',
+  password: '',
+});
 
   function handleChange(e) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError('');
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
-    // Basic validation
     if (!formData.firstName || !formData.email || !formData.password) {
       setError('Please fill in all required fields');
       return;
@@ -45,19 +46,23 @@ function RegisterPage({ onLogin }) {
       return;
     }
 
-    // Create a fake user and log them in
-    // In a real app this would call your backend API
-    const newUser = {
-      name: `${formData.firstName} ${formData.lastName}`,
-      email: formData.email,
-      role: role,
-      verified: false, // new users start unverified
-    };
+    if (role === 'worker') {
+      if (!/^\d{13}$/.test(formData.idNumber)) {
+         setError('South African ID number must be exactly 13 digits');
+        return;
+       }
+    }
 
-    onLogin(newUser);
-
-    // After register, send them to verify their identity
-    navigate('/verification');
+    setLoading(true);
+    try {
+      const { user } = await api.register(formData, role);
+      onLogin(user);
+      navigate('/verification');
+    } catch (err) {
+      setError(err.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   const provinces = [
@@ -67,11 +72,10 @@ function RegisterPage({ onLogin }) {
 
   return (
     <div className="auth-page">
-      {/* Left panel */}
       <div className="auth-left">
         <div className="auth-brand">
           <div className="auth-brand-icon">🔗</div>
-          WorkConnect SA
+          JobConnect SA
         </div>
 
         <div className="auth-left-content">
@@ -108,13 +112,11 @@ function RegisterPage({ onLogin }) {
         </div>
       </div>
 
-      {/* Right form panel */}
       <div className="auth-right">
         <div className="auth-form-box">
           <h2>Create Account</h2>
           <p className="subtitle">Choose your role to get started</p>
 
-          {/* Role selector */}
           <div className="role-tabs">
             <div
               className={`role-tab ${role === 'worker' ? 'active' : ''}`}
@@ -139,7 +141,6 @@ function RegisterPage({ onLogin }) {
           )}
 
           <form onSubmit={handleSubmit}>
-            {/* Name row */}
             <div className="form-row">
               <div className="form-group">
                 <label>First Name *</label>
@@ -184,6 +185,23 @@ function RegisterPage({ onLogin }) {
                 onChange={handleChange}
               />
             </div>
+            {role === 'worker' && (
+              <div className="form-group">
+                <label>South African ID Number *</label>
+                <input
+                  type="text"
+                  name="idNumber"
+                  placeholder="13-digit ID number"
+                  value={formData.idNumber}
+                  onChange={handleChange}
+                  maxLength={13}
+                  inputMode="numeric"
+                />
+                <small style={{ color: '#6b7280', fontSize: '0.8rem' }}>
+                  Your 13-digit ID number will be securely stored for future account verification.
+                </small>
+              </div>
+            )}
 
             <div className="form-group">
               <label>Province</label>
@@ -215,7 +233,6 @@ function RegisterPage({ onLogin }) {
               </div>
             </div>
 
-            {/* Terms checkbox */}
             <div className="terms-check">
               <input
                 type="checkbox"
@@ -224,13 +241,13 @@ function RegisterPage({ onLogin }) {
                 onChange={e => setAgreed(e.target.checked)}
               />
               <label htmlFor="terms">
-                I agree to the <a href="#">Terms of Service</a> and{' '}
-                <a href="#">Privacy Policy</a>. I understand my ID will be verified.
+                I agree to the Terms of Service and Privacy Policy.
+                I understand my ID will be verified.
               </label>
             </div>
 
-            <button type="submit" className="auth-submit-btn">
-              ✍️ Create My Account
+            <button type="submit" className="auth-submit-btn" disabled={loading}>
+              {loading ? 'Creating account...' : '✍️ Create My Account'}
             </button>
           </form>
 
