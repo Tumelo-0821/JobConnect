@@ -1,35 +1,60 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar/Navbar';
+import { api } from '../../services/api';
 import './PostJob.css';
 
 function PostJobPage({ user, onLogout }) {
   const navigate = useNavigate();
   const [submitted, setSubmitted] = useState(false);
   const [urgency, setUrgency] = useState('normal');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     title: '', category: '', description: '',
     budget: '', location: '', province: '', duration: '',
   });
 
-  // Redirect if not logged in or not verified
   if (!user) {
     navigate('/login');
     return null;
   }
 
-  function handleChange(e) {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  if (user.role !== 'employer') {
+    navigate('/worker-dashboard');
+    return null;
   }
 
-  function handleSubmit(e) {
+  function handleChange(e) {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError('');
+  }
+
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!user.verified) {
       navigate('/verification');
       return;
     }
-    // In a real app this sends the job to your backend
-    setSubmitted(true);
+
+    setLoading(true);
+    setError('');
+   try {
+  const jobData = {
+    ...formData,
+    urgency,
+  };
+
+  console.log('POSTING JOB:', jobData);
+
+  await api.createJob(jobData);
+
+  setSubmitted(true);
+    } catch (err) {
+      setError(err.message || 'Failed to post job');
+    } finally {
+      setLoading(false);
+    }
   }
 
   const categories = [
@@ -48,8 +73,6 @@ function PostJobPage({ user, onLogout }) {
       <Navbar user={user} onLogout={onLogout} />
 
       <div className="post-job-container">
-
-        {/* Back button and header */}
         <div className="page-header">
           <button className="back-btn" onClick={() => navigate(-1)}>
             ← Back
@@ -59,15 +82,13 @@ function PostJobPage({ user, onLogout }) {
         </div>
 
         {submitted ? (
-          /* Success screen */
           <div className="post-job-card">
             <div className="job-posted-success">
               <span className="success-icon">🎉</span>
               <h2>Job Posted!</h2>
               <p>
                 Your job "<strong>{formData.title || 'New Job'}</strong>" has been posted.
-                Workers near you will start applying soon. You will get notified when
-                someone applies.
+                Workers near you will start applying soon.
               </p>
               <button
                 className="back-to-dashboard-btn"
@@ -80,6 +101,10 @@ function PostJobPage({ user, onLogout }) {
         ) : (
           <div className="post-job-card">
             <h2>📋 Job Details</h2>
+
+            {error && (
+              <div className="form-error" style={{ marginBottom: '16px' }}>⚠️ {error}</div>
+            )}
 
             <form onSubmit={handleSubmit}>
               <div className="form-group">
@@ -108,7 +133,7 @@ function PostJobPage({ user, onLogout }) {
                 <label>Job Description *</label>
                 <textarea
                   name="description"
-                  placeholder="Describe what needs to be done. The more detail you give, the better applications you will get..."
+                  placeholder="Describe what needs to be done..."
                   value={formData.description}
                   onChange={handleChange}
                   required
@@ -164,7 +189,6 @@ function PostJobPage({ user, onLogout }) {
                 </div>
               </div>
 
-              {/* Urgency selector */}
               <div className="form-group">
                 <label>How Urgent Is This Job?</label>
                 <div className="urgency-toggle">
@@ -185,8 +209,8 @@ function PostJobPage({ user, onLogout }) {
                 </div>
               </div>
 
-              <button type="submit" className="submit-job-btn">
-                Post This Job
+              <button type="submit" className="submit-job-btn" disabled={loading}>
+                {loading ? 'Posting...' : 'Post This Job'}
               </button>
             </form>
           </div>

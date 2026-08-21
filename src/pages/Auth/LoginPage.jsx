@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { api } from '../../services/api';
 import './Auth.css';
 
 function LoginPage({ onLogin }) {
@@ -8,42 +9,39 @@ function LoginPage({ onLogin }) {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-
+  const [loading, setLoading] = useState(false);
+ const [selectedRole, setSelectedRole] = useState('worker');  
   function handleChange(e) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError('');
   }
-
-  function handleSubmit(e) {
+  
+  async function handleSubmit(e) {
     e.preventDefault();
 
-    // Basic check - in real app this talks to a backend
     if (!formData.email || !formData.password) {
       setError('Please fill in all fields');
       return;
     }
 
-    // FAKE login - just for frontend demo
-    // We check email to decide role
-    const isWorker = formData.email.includes('worker') || formData.email.includes('w@');
-    const fakeUser = {
-      name: isWorker ? 'Sipho Dlamini' : 'Fatima Meyer',
-      email: formData.email,
-      role: isWorker ? 'worker' : 'employer',
-      verified: true,
-    };
-
-    onLogin(fakeUser);
-    navigate(isWorker ? '/worker-dashboard' : '/employer-dashboard');
+    setLoading(true);
+    try {
+      const { user } = await api.login(formData.email, formData.password);
+      onLogin(user);
+      navigate(user.role === 'worker' ? '/worker-dashboard' : '/employer-dashboard');
+    } catch (err) {
+      setError(err.message || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <div className="auth-page">
-      {/* Left blue panel */}
       <div className="auth-left">
         <div className="auth-brand">
           <div className="auth-brand-icon">🔗</div>
-          WorkConnect SA
+          JobConnect SA
         </div>
 
         <div className="auth-left-content">
@@ -76,7 +74,6 @@ function LoginPage({ onLogin }) {
         </div>
       </div>
 
-      {/* Right form panel */}
       <div className="auth-right">
         <div className="auth-form-box">
           <h2>Login</h2>
@@ -85,7 +82,27 @@ function LoginPage({ onLogin }) {
           {error && (
             <div className="form-error">⚠️ {error}</div>
           )}
+          {/*Try and lets see */}
+           <div className="role-tabs">
+            <div
+                className={`role-tab ${selectedRole === 'worker' ? 'active' : ''}`}
+                onClick={() => setSelectedRole('worker')}
+                >
+              <span className="role-icon">👷</span>
+              <div className="role-name">I'm a Worker</div>
+              <div className="role-desc">Looking for jobs</div>
+            </div>
+            <div
+               className={`role-tab ${selectedRole === 'employer' ? 'active' : ''}`}
+                onClick={() => setSelectedRole('employer')}
+                      >   
+              <span className="role-icon">🏢</span>
+              <div className="role-name">I'm an Employer</div>
+              <div className="role-desc">Looking to hire</div>
+            </div>
+          </div>
 
+         { /*remove if not working */}
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Email Address</label>
@@ -119,13 +136,13 @@ function LoginPage({ onLogin }) {
             </div>
 
             <div style={{ textAlign: 'right', marginBottom: '20px' }}>
-              <a href="#" style={{ color: '#1a6fc4', fontSize: '0.85rem', fontWeight: '600' }}>
+              <Link to="#" style={{ color: '#1a6fc4', fontSize: '0.85rem', fontWeight: '600' }}>
                 Forgot password?
-              </a>
+              </Link>
             </div>
 
-            <button type="submit" className="auth-submit-btn">
-              🔑 Login to My Account
+            <button type="submit" className="auth-submit-btn" disabled={loading}>
+              {loading ? 'Logging in...' : '🔑 Login to My Account'}
             </button>
           </form>
 

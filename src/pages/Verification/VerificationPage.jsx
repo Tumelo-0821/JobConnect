@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar/Navbar';
+import { api } from '../../services/api';
 import './Verification.css';
 
 // This page walks the user through 3 steps:
@@ -13,7 +14,13 @@ function VerificationPage({ user, onLogin, onLogout }) {
   const [idUploaded, setIdUploaded] = useState(false);
   const [selfieCapture, setSelfieCapture] = useState(false);
 
-  // Step info for the progress bar
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+
+  if (!user) {
+    navigate('/login');
+    return null;
+  }
   const steps = [
     { number: 1, label: 'Upload ID' },
     { number: 2, label: 'Take Selfie' },
@@ -42,12 +49,20 @@ function VerificationPage({ user, onLogin, onLogout }) {
     }
   }
 
-  // When verification is complete, mark the user as verified
-  function handleComplete() {
-    if (onLogin && user) {
-      onLogin({ ...user, verified: true });
+  async function handleComplete() {
+    if (!onLogin || !user) return;
+
+    setSubmitting(true);
+    setError('');
+    try {
+      const verifiedUser = await api.verifyAccount();
+      onLogin(verifiedUser);
+      navigate(user.role === 'worker' ? '/worker-dashboard' : '/employer-dashboard');
+    } catch (err) {
+      setError(err.message || 'Verification failed. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
-    navigate(user?.role === 'worker' ? '/worker-dashboard' : '/employer-dashboard');
   }
 
   return (
@@ -60,7 +75,7 @@ function VerificationPage({ user, onLogin, onLogout }) {
           <span className="lock-icon">🪪</span>
           <h1>Verify Your Identity</h1>
           <p>
-            To keep WorkConnect SA safe for everyone, we need to confirm who you are.
+            To keep JobConnect SA safe for everyone, we need to confirm who you are.
             This only takes a few minutes.
           </p>
         </div>
@@ -213,9 +228,12 @@ function VerificationPage({ user, onLogin, onLogout }) {
               <p style={{ marginBottom: '28px' }}>
                 You can still browse the platform while we review your documents.
               </p>
-              <button className="go-dashboard-btn" onClick={handleComplete}>
-                Go to My Dashboard 🚀
+              <button className="go-dashboard-btn" onClick={handleComplete} disabled={submitting}>
+                {submitting ? 'Verifying...' : 'Go to My Dashboard 🚀'}
               </button>
+              {error && (
+                <p style={{ color: '#dc2626', marginTop: '12px' }}>⚠️ {error}</p>
+              )}
             </div>
           )}
         </div>

@@ -1,20 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-// Import global styles
 import './styles/global.css';
 
-// Import all pages
 import LandingPage        from './pages/LandingPage/LandingPage';
 import LoginPage          from './pages/Auth/LoginPage';
 import RegisterPage       from './pages/Auth/RegisterPage';
 import VerificationPage   from './pages/Verification/VerificationPage';
 import WorkerDashboard    from './pages/WorkerDashboard/WorkerDashboard';
+import WorkerProfile      from './pages/WorkerProfile/WorkerProfile';
 import EmployerDashboard  from './pages/EmployerDashboard/EmployerDashboard';
 import PostJobPage        from './pages/JobPost/PostJobPage';
 import ChatPage           from './pages/Chat/ChatPage';
+import { getStoredUser, clearAuth, api } from './services/api';
 
-// Simple placeholder for pages not built yet
 function ComingSoon({ pageName }) {
   return (
     <div style={{
@@ -41,59 +40,58 @@ function ComingSoon({ pageName }) {
 }
 
 function App() {
-  // Shared user state - passed down to every page that needs it
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(getStoredUser);
+  const [authLoading, setAuthLoading] = useState(!!getStoredUser());
+
+  useEffect(() => {
+    if (!getStoredUser()) {
+      setAuthLoading(false);
+      return;
+    }
+
+    api.getMe()
+      .then((freshUser) => setUser(freshUser))
+      .catch(() => {
+        clearAuth();
+        setUser(null);
+      })
+      .finally(() => setAuthLoading(false));
+  }, []);
 
   function handleLogin(userData) {
     setUser(userData);
   }
 
   function handleLogout() {
+    clearAuth();
     setUser(null);
   }
 
-  // Props we pass to every page (so they can show the right navbar)
-  const sharedProps = { user, onLogout: handleLogout };
+  const sharedProps = { user, onLogout: handleLogout, authLoading };
 
   return (
     <BrowserRouter>
       <Routes>
-
-        {/* ===== PUBLIC PAGES ===== */}
         <Route path="/"            element={<LandingPage       {...sharedProps} />} />
         <Route path="/login"       element={<LoginPage         onLogin={handleLogin} />} />
         <Route path="/register"    element={<RegisterPage      onLogin={handleLogin} />} />
-
-        {/* ===== AFTER REGISTER ===== */}
         <Route path="/verification" element={<VerificationPage {...sharedProps} onLogin={handleLogin} />} />
-
-        {/* ===== DASHBOARDS ===== */}
         <Route path="/worker-dashboard"   element={<WorkerDashboard   {...sharedProps} />} />
+        <Route path="/worker-profile"     element={<WorkerProfile     {...sharedProps} />} />
         <Route path="/employer-dashboard" element={<EmployerDashboard {...sharedProps} />} />
-
-        {/* ===== JOB PAGES ===== */}
         <Route path="/post-job" element={<PostJobPage {...sharedProps} />} />
         <Route path="/jobs"     element={<ComingSoon pageName="Browse Jobs" />} />
-
-        {/* ===== WORKER PAGES ===== */}
         <Route path="/workers"     element={<ComingSoon pageName="Browse Workers" />} />
         <Route path="/worker/:id"  element={<ComingSoon pageName="Worker Profile" />} />
-
-        {/* ===== CHAT ===== */}
         <Route path="/chat"    element={<ChatPage {...sharedProps} />} />
         <Route path="/chat/:id" element={<ChatPage {...sharedProps} />} />
-
-        {/* ===== MISC ===== */}
         <Route path="/how-it-works" element={<ComingSoon pageName="How It Works" />} />
         <Route path="/about"        element={<ComingSoon pageName="About Us" />} />
         <Route path="/support"      element={<ComingSoon pageName="Support" />} />
         <Route path="/privacy"      element={<ComingSoon pageName="Privacy Policy" />} />
         <Route path="/terms"        element={<ComingSoon pageName="Terms of Service" />} />
         <Route path="/contact"      element={<ComingSoon pageName="Contact Us" />} />
-
-        {/* 404 */}
         <Route path="*" element={<ComingSoon pageName="404 – Page Not Found" />} />
-
       </Routes>
     </BrowserRouter>
   );

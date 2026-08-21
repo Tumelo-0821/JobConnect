@@ -1,0 +1,245 @@
+from fastapi import HTTPException, status
+
+from app.models import ApplicationDocument, JobStatus
+from app.repositories.memory import ApplicationRepository, JobRepository, UserRepository
+from app.schemas.application import ApplicationResponse, ApplicationStatus, ApplicationStatusUpdate
+
+
+class ApplicationService:
+    def __init__(
+        self,
+        app_repo: ApplicationRepository,
+        job_repo: JobRepository,
+        user_repo: UserRepository,
+    ) -> None:
+        self.app_repo = app_repo
+        self.job_repo = job_repo
+        self.user_repo = user_repo
+
+    def apply(self, worker: dict, job_id: str) -> ApplicationResponse:
+        if not worker.get("is_verified"):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Verify your account before applying for jobs",
+            )
+
+        job_result = self.job_repo.get_by_id(job_id)
+        if not job_result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Job not found",
+            )
+
+        _, job_data = job_result
+        if job_data.get("status") != JobStatus.OPEN.value:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="This job is no longer accepting applications",
+            )
+
+        existing = self.app_repo.get_by_job_and_worker(job_id, worker["id"])
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="You have already applied for this job",
+            )
+
+        app_data = ApplicationDocument.create(
+            job_id=job_id,
+            worker_id=worker["id"],
+            employer_id=job_data["employer_id"],
+            job_title=job_data["title"],
+        )
+        app_id, created = self.app_repo.create(app_data)
+        self.job_repo.increment_application_count(job_id)
+
+        return ApplicationResponse(**ApplicationDocument.to_response(app_id, created))
+
+    def list_worker_applications(self, worker_id: str) -> list[ApplicationResponse]:
+        apps = self.app_repo.list_by_worker(worker_id)
+        return [
+            ApplicationResponse(**ApplicationDocument.to_response(app_id, data))
+            for app_id, data in apps
+        ]
+
+    def _get_worker_details(self, worker_id: str) -> dict:
+        worker_result = self.user_repo.get_by_id(worker_id)
+
+        if not worker_result:
+            return {
+                "worker_name": None,
+                "worker_email": None,
+                "worker_phone": None,
+                "worker_skills": [],
+                "worker_bio": None,
+                "worker_province": None,
+            }
+
+        _, worker_data = worker_result
+
+        worker_name = (
+            f"{worker_data.get('first_name', '')} "
+            f"{worker_data.get('last_name', '')}"
+        ).strip()
+
+        return {
+            "worker_name": worker_name or None,
+            "worker_email": worker_data.get("email"),
+            "worker_phone": worker_data.get("phone"),
+            "worker_skills": worker_data.get("skills", []),
+            "worker_bio": worker_data.get("bio"),
+            "worker_province": worker_data.get("province"),
+        }
+
+    def list_job_applications(self, employer_id: str, job_id: str) -> list[ApplicationResponse]:
+        job_result = self.job_repo.get_by_id(job_id)
+        if not job_result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Job not found",
+            )
+
+        _, job_data = job_result
+        if job_data.get("employer_id") != employer_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to view these applications",
+            )
+
+        apps = self.app_repo.list_by_job(job_id)
+        results = []
+        for app_id, data in apps:
+            worker_details = self._get_worker_details(
+                data.get("worker_id", "")
+            )
+
+            results.append(
+                ApplicationResponse(
+                    **ApplicationDocument.to_response(
+                        app_id,
+                        data,
+                        **worker_details,
+                    )
+                )
+            )
+        return results
+
+    def list_employer_applications(self, employer_id: str) -> list[ApplicationResponse]:
+        jobs = self.job_repo.list_by_employer(employer_id)
+
+        results = []
+
+        for job_id, job_data in jobs:
+            apps = self.app_repo.list_by_job(job_id)
+
+            for app_id, data in apps:
+                worker_details = self._get_worker_details(
+                    data.get("worker_id", "")
+                )
+
+                results.append(
+                        ApplicationResponse(
+                            **ApplicationDocument.to_response(
+                                app_id,
+                                data,
+                                job_status=job_data.get("status"),
+                                **worker_details,
+                            )
+                        )
+                    )
+
+        return results
+
+    def update_application_status(
+        self,
+        employer_id: str,
+        job_id: str,
+        app_id: str,
+        payload: ApplicationStatusUpdate,
+    ) -> ApplicationResponse:
+        # Check that the job exists
+        job_result = self.job_repo.get_by_id(job_id)
+        if not job_result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Job not found",
+            )
+
+        _, job_data = job_result
+
+        # Make sure this employer owns the job
+        if job_data.get("employer_id") != employer_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to update this application",
+            )
+
+        # Check that the application exists
+        app_result = self.app_repo.get_by_id(app_id)
+        if not app_result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Application not found",
+            )
+
+        _, app_data = app_result
+
+        # Make sure the application belongs to this job
+        if app_data.get("job_id") != job_id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Application not found",
+            )
+
+        current_status = app_data.get("status")
+        new_status = payload.status.value
+
+        # Do not allow changes to an already hired or rejected application
+        if current_status == "hired":
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="This application has already been hired",
+            )
+
+        if current_status == "rejected":
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="This application has already been rejected",
+            )
+
+        # If employer is hiring this worker, make sure nobody else
+        # has already been hired for this job.
+        if new_status == "hired":
+            hired_application = self.app_repo.get_hired_by_job(job_id)
+
+            if hired_application:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="A worker has already been hired for this job",
+                )
+
+        # Update the application status
+        updated = self.app_repo.update(
+            app_id,
+            {"status": new_status},
+        )
+
+        # Get worker's name for the response
+        worker_details = self._get_worker_details(
+            updated.get("worker_id", "")
+        )
+
+        return ApplicationResponse(
+            **ApplicationDocument.to_response(
+                app_id,
+                updated,
+                **worker_details,
+            )
+        )
+
+    def count_employer_applications(self, employer_id: str) -> int:
+        jobs = self.job_repo.list_by_employer(employer_id)
+        total = 0
+        for job_id, _ in jobs:
+            total += len(self.app_repo.list_by_job(job_id))
+        return total
