@@ -128,6 +128,21 @@ export const api = {
     saveAuth(getToken(), user);
     return user;
   },
+    async getNotifications() {
+    return request('/notifications');
+  },
+
+  async markNotificationAsRead(notificationId) {
+    return request(`/notifications/${notificationId}/read`, {
+      method: 'PATCH',
+    });
+  },
+
+  async markAllNotificationsAsRead() {
+    return request('/notifications/read-all', {
+      method: 'PATCH',
+    });
+  },
 
   async verifyAccount() {
     const data = await request('/auth/verify', { method: 'POST' });
@@ -196,6 +211,21 @@ async getJobApplications(jobId) {
   async getMyApplications() {
     return request('/workers/me/applications');
   },
+    async getNotifications() {
+    return request('/notifications');
+  },
+
+  async markNotificationAsRead(notificationId) {
+    return request(`/notifications/${notificationId}/read`, {
+      method: 'PATCH',
+    });
+  },
+
+  async markAllNotificationsAsRead() {
+    return request('/notifications/read-all', {
+      method: 'PATCH',
+    });
+  },
 
   async updateWorkerProfile(updates) {
     const data = await request('/workers/me/profile', {
@@ -205,5 +235,20 @@ async getJobApplications(jobId) {
     const user = mapUser(data);
     saveAuth(getToken(), user);
     return user;
+  },
+    async getNotifications() {
+    return request('/notifications');
+  },
+
+  async markNotificationAsRead(notificationId) {
+    return request(`/notifications/${notificationId}/read`, {
+      method: 'PATCH',
+    });
+  },
+
+  async markAllNotificationsAsRead() {
+    return request('/notifications/read-all', {
+      method: 'PATCH',
+    });
   },
 };

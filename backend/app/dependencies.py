@@ -7,12 +7,14 @@ from app.models import UserDocument, UserRole
 from app.repositories.memory import UserRepository
 from app.repositories.user_repository import FirestoreUserRepository
 from app.security import decode_access_token
+from app.repositories.notification_repository import NotificationRepository
 
 security = HTTPBearer(auto_error=False)
 
 _user_repo: UserRepository | None = None
 _job_repo: Any | None = None
 _application_repo: Any | None = None
+_notification_repo: NotificationRepository | None = None
 
 
 def set_repositories(user_repo: UserRepository, job_repo: Any, application_repo: Any | None = None) -> None:
@@ -106,3 +108,8 @@ def get_current_worker(
 
 def user_to_public(user: dict[str, Any]) -> dict[str, Any]:
     return UserDocument.to_public(user["id"], user)
+
+def get_notification_repository() -> NotificationRepository:
+    if _notification_repo is not None:
+        return _notification_repo
+    return NotificationRepository()

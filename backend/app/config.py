@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 1440
 
     firebase_credentials_path: str = "./firebase-service-account.json"
+    firebase_credentials_json: str = ""
     firebase_storage_bucket: str = ""
 
     firestore_users_collection: str = "users"
@@ -25,7 +26,11 @@ class Settings(BaseSettings):
 
     @property
     def cors_origin_list(self) -> list[str]:
-        return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+        return [
+            origin.strip()
+            for origin in self.cors_origins.split(",")
+            if origin.strip()
+        ]
 
 
 settings = Settings()
