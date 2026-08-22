@@ -3,6 +3,9 @@ from fastapi import HTTPException, status
 from app.models import ApplicationDocument, JobStatus
 from app.repositories.memory import ApplicationRepository, JobRepository, UserRepository
 from app.schemas.application import ApplicationResponse, ApplicationStatus, ApplicationStatusUpdate
+from app.repositories.notification_repository import NotificationRepository
+from app.schemas.notification import NotificationType
+from app.services.notification_service import NotificationService
 
 
 class ApplicationService:
@@ -11,10 +14,12 @@ class ApplicationService:
         app_repo: ApplicationRepository,
         job_repo: JobRepository,
         user_repo: UserRepository,
+        notification_repo: NotificationRepository,
     ) -> None:
         self.app_repo = app_repo
         self.job_repo = job_repo
         self.user_repo = user_repo
+        self.notification_service = NotificationService(notification_repo)
 
     def apply(self, worker: dict, job_id: str) -> ApplicationResponse:
         if not worker.get("is_verified"):
@@ -52,6 +57,17 @@ class ApplicationService:
         )
         app_id, created = self.app_repo.create(app_data)
         self.job_repo.increment_application_count(job_id)
+        self.notification_service.create_notification(
+    recipient_id=job_data["employer_id"],
+    notification_type=NotificationType.APPLICATION_RECEIVED,
+    title="New job application",
+    message=(
+        f"{worker.get('first_name', 'A worker')} "
+        f"has applied for your job '{job_data['title']}'."
+    ),
+    related_job_id=job_id,
+    related_application_id=app_id,
+)
 
         return ApplicationResponse(**ApplicationDocument.to_response(app_id, created))
 
@@ -223,6 +239,34 @@ class ApplicationService:
             app_id,
             {"status": new_status},
         )
+        worker_id = updated.get("worker_id")
+
+        if worker_id:
+            if new_status == "hired":
+                self.notification_service.create_notification(
+                    recipient_id=worker_id,
+                    notification_type=NotificationType.APPLICATION_HIRED,
+                    title="You have been hired!",
+                    message=(
+                        f"Congratulations! You have been hired for "
+                        f"'{job_data['title']}'."
+                    ),
+                    related_job_id=job_id,
+                    related_application_id=app_id,
+                )
+
+            elif new_status == "rejected":
+                self.notification_service.create_notification(
+                    recipient_id=worker_id,
+                    notification_type=NotificationType.APPLICATION_REJECTED,
+                    title="Application update",
+                    message=(
+                        f"Your application for '{job_data['title']}' "
+                        f"was not successful."
+                    ),
+                    related_job_id=job_id,
+                    related_application_id=app_id,
+                )
 
         # Get worker's name for the response
         worker_details = self._get_worker_details(

@@ -1,14 +1,24 @@
 from fastapi import HTTPException, status
 
 from app.models import JobDocument, JobStatus
-from app.repositories.memory import JobRepository
+from app.repositories.memory import JobRepository, UserRepository
+from app.repositories.notification_repository import NotificationRepository
 from app.schemas.auth import JobUrgency
 from app.schemas.job import JobCreateRequest, JobResponse, JobUpdateRequest
+from app.schemas.notification import NotificationType
+from app.services.notification_service import NotificationService
 
 
 class JobService:
-    def __init__(self, job_repo: JobRepository) -> None:
+    def __init__(
+        self,
+        job_repo: JobRepository,
+        user_repo: UserRepository,
+        notification_repo: NotificationRepository,
+    ) -> None:
         self.job_repo = job_repo
+        self.user_repo = user_repo
+        self.notification_service = NotificationService(notification_repo)
 
     def create_job(self, employer_id: str, payload: JobCreateRequest) -> JobResponse:
         job_data = JobDocument.create(
@@ -26,6 +36,43 @@ class JobService:
             closing_date=payload.closing_date,
         )
         job_id, created = self.job_repo.create(job_data)
+
+        # Notify verified workers whose skills match the job
+        required_skills = {
+            skill.strip().lower()
+            for skill in payload.required_skills
+            if skill and skill.strip()
+        }
+
+        if required_skills:
+            workers = self.user_repo.list_workers()
+
+            for worker_id, worker_data in workers:
+                if not worker_data.get("is_verified"):
+                    continue
+
+                worker_skills = {
+                    str(skill).strip().lower()
+                    for skill in worker_data.get("skills", [])
+                    if skill
+                }
+
+                matching_skills = required_skills.intersection(worker_skills)
+
+                if not matching_skills:
+                    continue
+
+                self.notification_service.create_notification(
+                    recipient_id=worker_id,
+                    notification_type=NotificationType.JOB_MATCH,
+                    title="New job matching your skills",
+                    message=(
+                        f"A new job '{payload.title}' has been posted "
+                        f"and matches your skills."
+                    ),
+                    related_job_id=job_id,
+                )
+
         return JobResponse(**JobDocument.to_response(job_id, created))
 
     def list_jobs(self, employer_id: str) -> list[JobResponse]:

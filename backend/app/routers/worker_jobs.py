@@ -1,6 +1,14 @@
 from fastapi import APIRouter, Depends, Query, status
 
-from app.dependencies import get_application_repository, get_current_worker, get_job_repository, get_user_repository
+from app.dependencies import (
+    get_application_repository,
+    get_current_worker,
+    get_job_repository,
+    get_user_repository,
+    get_notification_repository,
+)
+
+from app.repositories.notification_repository import NotificationRepository
 from app.repositories.memory import ApplicationRepository, JobRepository, UserRepository
 from app.schemas.application import ApplicationResponse
 from app.schemas.job import JobResponse
@@ -10,16 +18,34 @@ from app.services.job_service import JobService
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
 
-def get_job_service(job_repo: JobRepository = Depends(get_job_repository)) -> JobService:
-    return JobService(job_repo)
+def get_job_service(
+    job_repo: JobRepository = Depends(get_job_repository),
+    user_repo: UserRepository = Depends(get_user_repository),
+    notification_repo: NotificationRepository = Depends(
+        get_notification_repository
+    ),
+) -> JobService:
+    return JobService(
+        job_repo,
+        user_repo,
+        notification_repo,
+    )
 
 
 def get_application_service(
     app_repo: ApplicationRepository = Depends(get_application_repository),
     job_repo: JobRepository = Depends(get_job_repository),
     user_repo: UserRepository = Depends(get_user_repository),
+    notification_repo: NotificationRepository = Depends(
+        get_notification_repository
+    ),
 ) -> ApplicationService:
-    return ApplicationService(app_repo, job_repo, user_repo)
+    return ApplicationService(
+        app_repo,
+        job_repo,
+        user_repo,
+        notification_repo,
+    )
 
 
 @router.get(

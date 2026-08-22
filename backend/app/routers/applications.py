@@ -1,9 +1,16 @@
 from fastapi import APIRouter, Depends
 
-from app.dependencies import get_current_employer, get_application_repository, get_job_repository, get_user_repository
+from app.dependencies import (
+    get_current_employer,
+    get_application_repository,
+    get_job_repository,
+    get_user_repository,
+    get_notification_repository,
+)
 from app.repositories.memory import ApplicationRepository, JobRepository, UserRepository
 from app.schemas.application import ApplicationResponse, ApplicationStatusUpdate
 from app.services.application_service import ApplicationService
+from app.repositories.notification_repository import NotificationRepository
 
 #router = APIRouter(prefix="/employers/jobs", tags=["Applications"])
 router = APIRouter(prefix="/employers", tags=["Applications"])
@@ -12,8 +19,16 @@ def get_application_service(
     app_repo: ApplicationRepository = Depends(get_application_repository),
     job_repo: JobRepository = Depends(get_job_repository),
     user_repo: UserRepository = Depends(get_user_repository),
+    notification_repo: NotificationRepository = Depends(
+        get_notification_repository
+    ),
 ) -> ApplicationService:
-    return ApplicationService(app_repo, job_repo, user_repo)
+    return ApplicationService(
+        app_repo,
+        job_repo,
+        user_repo,
+        notification_repo,
+    )
 
 @router.get(
     "/all-applications",

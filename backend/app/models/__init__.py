@@ -256,3 +256,46 @@ def _province_abbrev(province: str) -> str:
         "Northern Cape": "NC",
     }
     return mapping.get(province, province)
+
+class NotificationDocument:
+    """Firestore notification document shape."""
+
+    @staticmethod
+    def create(
+        *,
+        recipient_id: str,
+        notification_type: str,
+        title: str,
+        message: str,
+        related_job_id: str | None = None,
+        related_application_id: str | None = None,
+    ) -> dict[str, Any]:
+        now = utc_now()
+
+        return {
+            "recipient_id": recipient_id,
+            "type": notification_type,
+            "title": title,
+            "message": message,
+            "related_job_id": related_job_id,
+            "related_application_id": related_application_id,
+            "is_read": False,
+            "created_at": now,
+        }
+
+    @staticmethod
+    def to_response(
+        doc_id: str,
+        data: dict[str, Any],
+    ) -> dict[str, Any]:
+        return {
+            "id": doc_id,
+            "recipient_id": data.get("recipient_id"),
+            "type": data.get("type"),
+            "title": data.get("title"),
+            "message": data.get("message"),
+            "related_job_id": data.get("related_job_id"),
+            "related_application_id": data.get("related_application_id"),
+            "is_read": bool(data.get("is_read", False)),
+            "created_at": data.get("created_at"),
+        }
