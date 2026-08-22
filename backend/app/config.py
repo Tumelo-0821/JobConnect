@@ -16,9 +16,8 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 1440
 
-    firebase_credentials_path: str = "./firebase-service-account.json"
+    firebase_credentials_path: str = "/etc/secrets/firebase-service-account.json"
     firebase_credentials_json: str = ""
-    firebase_storage_bucket: str = ""
 
     firestore_users_collection: str = "users"
     firestore_jobs_collection: str = "jobs"

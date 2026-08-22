@@ -1,5 +1,3 @@
-import json
-
 import firebase_admin
 from firebase_admin import credentials, firestore
 
@@ -15,17 +13,9 @@ def init_firebase() -> None:
     if _firebase_app is not None:
         return
 
-    # Use Firebase credentials from Render environment variable
-    # when available. Otherwise use the local JSON file.
-    if settings.firebase_credentials_json:
-        service_account_info = json.loads(
-            settings.firebase_credentials_json
-        )
-        cred = credentials.Certificate(service_account_info)
-    else:
-        cred = credentials.Certificate(
-            settings.firebase_credentials_path
-        )
+    cred = credentials.Certificate(
+        settings.firebase_credentials_path
+    )
 
     options = {}
 
@@ -50,7 +40,7 @@ def get_firestore() -> firestore.Client:
 
 
 def reset_firebase() -> None:
-    """Reset Firebase state – used in tests."""
+    """Reset Firebase state - used in tests."""
     global _firebase_app, _firestore_client
 
     if _firebase_app is not None:
