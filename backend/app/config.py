@@ -10,7 +10,7 @@ class Settings(BaseSettings):
 
     app_env: str = "development"
     app_name: str = "JobConnect API"
-    cors_origins: str = "http://localhost:3000"
+    cors_origins: str = "http://localhost:3000,http://127.0.0.1:8000"
 
     jwt_secret_key: str
     jwt_algorithm: str = "HS256"
@@ -23,6 +23,11 @@ class Settings(BaseSettings):
     firestore_users_collection: str = "users"
     firestore_jobs_collection: str = "jobs"
     firestore_applications_collection: str = "applications"
+
+    # Twilio SMS settings
+    twilio_account_sid: str = ""
+    twilio_auth_token: str = ""
+    twilio_phone_number: str = ""
 
     @property
     def cors_origin_list(self) -> list[str]:
