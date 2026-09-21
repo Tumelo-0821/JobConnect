@@ -5,3 +5,4 @@ build/
 firebase-service-account.json
 __pycache__/
 *.pyc
+uploads/

@@ -19,6 +19,8 @@ function WorkerProfile({ user, onLogout, authLoading }) {
   });
 
   const [saving, setSaving] = useState(false);
+  const [uploadingCV, setUploadingCV] = useState(false);
+  const [cvFileName, setCvFileName] = useState(user?.cv_file_name || '');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
@@ -61,6 +63,47 @@ function WorkerProfile({ user, onLogout, authLoading }) {
 
     setMessage('');
     setError('');
+  }
+
+    async function handleCVUpload(e) {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    setMessage('');
+    setError('');
+
+    const allowedTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      setError('Please upload a PDF, DOC, or DOCX file.');
+      e.target.value = '';
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError('CV file must not exceed 5 MB.');
+      e.target.value = '';
+      return;
+    }
+
+    setUploadingCV(true);
+
+    try {
+      const result = await api.uploadWorkerCV(file);
+
+      setCvFileName(result.cv_file_name || file.name);
+      setMessage('CV uploaded successfully.');
+    } catch (err) {
+      setError(err.message || 'Failed to upload CV.');
+    } finally {
+      setUploadingCV(false);
+      e.target.value = '';
+    }
   }
 
   async function handleSubmit(e) {
@@ -275,6 +318,41 @@ function WorkerProfile({ user, onLogout, authLoading }) {
                 onChange={handleChange}
               />
             </div>
+          </div>
+
+                     <div className="form-section">
+            <h2>Curriculum Vitae (CV)</h2>
+
+            <div className="form-group">
+              <label htmlFor="cv-upload">
+                Upload your CV
+              </label>
+
+              <input
+                id="cv-upload"
+                type="file"
+                accept=".pdf,.doc,.docx"
+                onChange={handleCVUpload}
+                disabled={uploadingCV}
+              />
+
+              <small>
+                Upload a PDF, DOC, or DOCX file. Maximum size: 5 MB.
+              </small>
+            </div>
+
+            {cvFileName && (
+              <div className="cv-file-display">
+                <strong>Current CV:</strong>{' '}
+                {cvFileName}
+              </div>
+            )}
+
+            {uploadingCV && (
+              <div className="cv-upload-status">
+                Uploading CV...
+              </div>
+            )}
           </div>
 
           <div className="profile-actions">

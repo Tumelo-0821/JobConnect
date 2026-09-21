@@ -575,3 +575,28 @@
     padding: 76px 12px 30px;
   }
 }
+
+/* ===== Job Description ===== */
+
+.job-description {
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: #f4f8ff;
+  border-left: 4px solid #1a6fc4;
+  border-radius: 10px;
+}
+
+.job-description h4 {
+  margin: 0 0 7px;
+  color: #155da5;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.job-description p {
+  margin: 0;
+  color: #4b5563;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}

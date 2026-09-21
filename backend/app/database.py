@@ -1,3 +1,5 @@
+import json
+
 import firebase_admin
 from firebase_admin import credentials, firestore
 
@@ -13,9 +15,17 @@ def init_firebase() -> None:
     if _firebase_app is not None:
         return
 
-    cred = credentials.Certificate(
-        settings.firebase_credentials_path
-    )
+    if settings.firebase_credentials_json:
+        service_account_info = json.loads(
+            settings.firebase_credentials_json
+        )
+
+        cred = credentials.Certificate(service_account_info)
+
+    else:
+        cred = credentials.Certificate(
+            settings.firebase_credentials_path
+        )
 
     options = {}
 

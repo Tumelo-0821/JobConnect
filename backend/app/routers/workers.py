@@ -1,17 +1,19 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, File, UploadFile, Query
+from app.services.cv_service import CVService
 
 from app.dependencies import (
-    get_application_repository,
     get_current_worker,
+    get_application_repository,
     get_job_repository,
     get_user_repository,
-    get_notification_repository
+    get_notification_repository,
 )
 from app.repositories.memory import ApplicationRepository, JobRepository, UserRepository
 from app.schemas.application import ApplicationResponse
 from app.schemas.auth import UserPublic, WorkerListing, WorkerProfileUpdate
 from app.services.application_service import ApplicationService
 from app.services.worker_service import WorkerService
+from app.repositories.notification_repository import NotificationRepository
 
 router = APIRouter(prefix="/workers", tags=["Workers"])
 
@@ -19,18 +21,24 @@ router = APIRouter(prefix="/workers", tags=["Workers"])
 def get_worker_service(user_repo: UserRepository = Depends(get_user_repository)) -> WorkerService:
     return WorkerService(user_repo)
 
+def get_cv_service(
+    user_repo: UserRepository = Depends(get_user_repository),
+) -> CVService:
+    return CVService(user_repo)
+
 
 def get_application_service(
     app_repo: ApplicationRepository = Depends(get_application_repository),
     job_repo: JobRepository = Depends(get_job_repository),
     user_repo: UserRepository = Depends(get_user_repository),
-) -> ApplicationService:
+    notification_repo: NotificationRepository = Depends(get_notification_repository),
+):
     return ApplicationService(
-    app_repo,
-    job_repo,
-    user_repo,
-    get_notification_repository(),
-)
+        app_repo,
+        job_repo,
+        user_repo,
+        notification_repo,
+    )
 
 
 @router.get(
@@ -70,6 +78,19 @@ def update_worker_profile(
 ) -> UserPublic:
     return worker_service.update_profile(worker, payload)
 
+@router.post(
+    "/me/cv",
+    summary="Upload worker CV",
+)
+async def upload_worker_cv(
+    file: UploadFile = File(...),
+    worker: dict = Depends(get_current_worker),
+    cv_service: CVService = Depends(get_cv_service),
+) -> dict:
+    return await cv_service.upload_cv(
+        worker,
+        file,
+    )
 
 @router.get(
     "/me/applications",

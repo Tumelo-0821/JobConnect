@@ -29,9 +29,12 @@ export function clearAuth() {
 
 async function request(path, options = {}) {
   const headers = {
-    'Content-Type': 'application/json',
     ...(options.headers || {}),
   };
+
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   const token = getToken();
   if (token) {
@@ -77,6 +80,7 @@ async function request(path, options = {}) {
 
 function mapUser(user) {
   if (!user) return null;
+
   return {
     id: user.id,
     name: user.name,
@@ -89,6 +93,8 @@ function mapUser(user) {
     bio: user.bio,
     rating: user.rating,
     review_count: user.review_count,
+    cv_file_name: user.cv_file_name || null,
+    cv_available: user.cv_available || false,
   };
 }
 
@@ -158,7 +164,37 @@ export const api = {
 async getEmployerApplications() {
   return request('/employers/all-applications');
 },
+  async getApplicationCV(jobId, applicationId) {
+    const token = getToken();
 
+    const response = await fetch(
+      `${API_BASE}/employers/jobs/${jobId}/applications/${applicationId}/cv`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      let message = 'Failed to retrieve CV';
+
+      try {
+        const data = await response.json();
+
+        if (data?.detail) {
+          message = data.detail;
+        }
+      } catch {
+        // Response was not JSON.
+      }
+
+      throw new Error(message);
+    }
+
+    return response.blob();
+  },
 async getJobApplications(jobId) {
   return request(`/employers/jobs/${jobId}/applications`);
 },
@@ -174,12 +210,20 @@ async getJobApplications(jobId) {
     return request(`/employers/jobs/${jobId}/close`, { method: 'POST' });
   },
 
-  async updateApplicationStatus(jobId, applicationId, status) {
+ async updateApplicationStatus(
+  jobId,
+  applicationId,
+  status,
+  rejectionMessage = null
+) {
   return request(
     `/employers/jobs/${jobId}/applications/${applicationId}`,
     {
       method: 'PATCH',
-      body: JSON.stringify({ status }),
+      body: JSON.stringify({
+        status,
+        rejection_message: rejectionMessage,
+      }),
     }
   );
 },
@@ -235,6 +279,30 @@ async getJobApplications(jobId) {
     const user = mapUser(data);
     saveAuth(getToken(), user);
     return user;
+  },
+
+    async uploadWorkerCV(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const data = await request('/workers/me/cv', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const currentUser = getStoredUser();
+
+    if (currentUser) {
+      const updatedUser = {
+        ...currentUser,
+        cv_file_name: data.cv_file_name || null,
+        cv_available: true,
+      };
+
+      saveAuth(getToken(), updatedUser);
+    }
+
+    return data;
   },
     async getNotifications() {
     return request('/notifications');

@@ -83,12 +83,14 @@ class ApplicationService:
 
         if not worker_result:
             return {
-                "worker_name": None,
-                "worker_email": None,
-                "worker_phone": None,
-                "worker_skills": [],
-                "worker_bio": None,
-                "worker_province": None,
+        "worker_name": None,
+        "worker_email": None,
+        "worker_phone": None,
+        "worker_skills": [],
+        "worker_bio": None,
+        "worker_province": None,
+        "worker_cv_file_name": None,
+        "worker_cv_available": False,
             }
 
         _, worker_data = worker_result
@@ -105,6 +107,8 @@ class ApplicationService:
             "worker_skills": worker_data.get("skills", []),
             "worker_bio": worker_data.get("bio"),
             "worker_province": worker_data.get("province"),
+            "worker_cv_file_name": worker_data.get("cv_file_name"),
+            "worker_cv_available": bool(worker_data.get("cv_storage_path")),
         }
 
     def list_job_applications(self, employer_id: str, job_id: str) -> list[ApplicationResponse]:
@@ -210,6 +214,17 @@ class ApplicationService:
         current_status = app_data.get("status")
         new_status = payload.status.value
 
+        if new_status == "rejected":
+            rejection_message = (
+                payload.rejection_message or ""
+            ).strip()
+
+            if not rejection_message:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Please provide a rejection message",
+                )
+
         # Do not allow changes to an already hired or rejected application
         if current_status == "hired":
             raise HTTPException(
@@ -237,7 +252,7 @@ class ApplicationService:
         # Update the application status
         updated = self.app_repo.update(
             app_id,
-            {"status": new_status},
+            {"status": new_status, "rejection_message": rejection_message} if new_status == "rejected" else {"status": new_status},
         )
         worker_id = updated.get("worker_id")
 
@@ -261,13 +276,14 @@ class ApplicationService:
                     notification_type=NotificationType.APPLICATION_REJECTED,
                     title="Application update",
                     message=(
-                        f"Your application for '{job_data['title']}' "
-                        f"was not successful."
+                        f"Your application for "
+                        f"'{job_data['title']}' was not successful.\n\n"
+                        f"Employer message:\n"
+                        f"{payload.rejection_message.strip()}"
                     ),
                     related_job_id=job_id,
                     related_application_id=app_id,
                 )
-
         # Get worker's name for the response
         worker_details = self._get_worker_details(
             updated.get("worker_id", "")
@@ -284,6 +300,84 @@ class ApplicationService:
     def count_employer_applications(self, employer_id: str) -> int:
         jobs = self.job_repo.list_by_employer(employer_id)
         total = 0
+
         for job_id, _ in jobs:
             total += len(self.app_repo.list_by_job(job_id))
+
         return total
+
+    def get_application_cv(
+        self,
+        employer_id: str,
+        job_id: str,
+        app_id: str,
+    ) -> dict:
+        # Check that the job exists
+        job_result = self.job_repo.get_by_id(job_id)
+
+        if not job_result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Job not found",
+            )
+
+        _, job_data = job_result
+
+        # Make sure this employer owns the job
+        if job_data.get("employer_id") != employer_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to view this CV",
+            )
+
+        # Check that the application exists
+        app_result = self.app_repo.get_by_id(app_id)
+
+        if not app_result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Application not found",
+            )
+
+        _, app_data = app_result
+
+        # Make sure this application belongs to this job
+        if app_data.get("job_id") != job_id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Application not found",
+            )
+
+        worker_id = app_data.get("worker_id")
+
+        if not worker_id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Worker not found",
+            )
+
+        # Get the worker's CV information
+        worker_result = self.user_repo.get_by_id(worker_id)
+
+        if not worker_result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Worker not found",
+            )
+
+        _, worker_data = worker_result
+
+        cv_path = worker_data.get("cv_storage_path")
+        cv_file_name = worker_data.get("cv_file_name")
+
+        if not cv_path or not cv_file_name:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="This worker has not uploaded a CV",
+            )
+
+        return {
+            "worker_id": worker_id,
+            "cv_file_name": cv_file_name,
+            "cv_storage_path": cv_path,
+        }

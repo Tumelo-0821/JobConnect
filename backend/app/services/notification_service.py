@@ -4,15 +4,17 @@ from app.schemas.notification import (
     NotificationResponse,
     NotificationType,
 )
+from app.services.sms_service import SMSService
 
 
 class NotificationService:
 
     def __init__(
-        self,
-        notification_repo: NotificationRepository,
+    self,
+    notification_repo: NotificationRepository,
     ) -> None:
-        self.notification_repo = notification_repo
+     self.notification_repo = notification_repo
+     self.sms_service = SMSService()
 
     def create_notification(
         self,
@@ -32,6 +34,13 @@ class NotificationService:
             message=message,
             related_job_id=related_job_id,
             related_application_id=related_application_id,
+        )
+
+     # Send SMS in addition to the in-app notification
+        self.sms_service.send_notification_sms(
+            recipient_id=recipient_id,
+            title=title,
+            message=message,
         )
 
         return NotificationResponse(

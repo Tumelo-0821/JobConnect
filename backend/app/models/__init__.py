@@ -221,6 +221,8 @@ class ApplicationDocument:
         worker_skills: list[str] | None = None,
         worker_bio: str | None = None,
         worker_province: str | None = None,
+        worker_cv_file_name: str | None = None,
+        worker_cv_available: bool = False,
     ) -> dict[str, Any]:
         return {
             "id": doc_id,
@@ -236,6 +238,8 @@ class ApplicationDocument:
             "worker_skills": worker_skills or [],
             "worker_bio": worker_bio,
             "worker_province": worker_province,
+            "worker_cv_file_name": worker_cv_file_name,
+            "worker_cv_available": worker_cv_available,
 
             "status": data.get("status"),
             "created_at": data.get("created_at"),
