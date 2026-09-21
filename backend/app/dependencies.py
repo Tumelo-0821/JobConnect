@@ -4,7 +4,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.models import UserDocument, UserRole
-from app.repositories.memory import UserRepository
+from app.repositories.memory import UserRepository, ChatRepository
 from app.repositories.user_repository import FirestoreUserRepository
 from app.security import decode_access_token
 from app.repositories.notification_repository import NotificationRepository
@@ -15,6 +15,7 @@ _user_repo: UserRepository | None = None
 _job_repo: Any | None = None
 _application_repo: Any | None = None
 _notification_repo: NotificationRepository | None = None
+_chat_repo: ChatRepository | None = None
 
 
 def set_repositories(user_repo: UserRepository, job_repo: Any, application_repo: Any | None = None) -> None:
@@ -113,3 +114,11 @@ def get_notification_repository() -> NotificationRepository:
     if _notification_repo is not None:
         return _notification_repo
     return NotificationRepository()
+
+def get_chat_repository() -> ChatRepository:
+    if _chat_repo is not None:
+        return _chat_repo
+
+    from app.repositories.chat_repository import FirestoreChatRepository
+
+    return FirestoreChatRepository()

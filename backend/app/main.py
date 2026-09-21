@@ -8,6 +8,7 @@ from app.database import init_firebase
 from app.routers import (
     applications,
     auth,
+    chat,
     employer_stats,
     employers,
     jobs,
@@ -51,6 +52,7 @@ app.include_router(worker_jobs.router, prefix=API_PREFIX)
 app.include_router(applications.router, prefix=API_PREFIX)
 app.include_router(employer_stats.router, prefix=API_PREFIX)
 app.include_router(notifications.router, prefix=API_PREFIX)
+app.include_router(chat.router, prefix=API_PREFIX)
 
 @app.get("/health", tags=["Health"])
 def health_check() -> dict[str, str]:

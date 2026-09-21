@@ -185,22 +185,32 @@ function Navbar({ user, onLogout }) {
 
           {/* Desktop links */}
           <ul className="navbar-links">
-            <li>
-              <Link to="/">Home</Link>
-            </li>
+  <li>
+    <Link to="/">Home</Link>
+  </li>
 
-            <li>
-              <Link to="/workers">Browse Workers</Link>
-            </li>
+  {user?.role === 'employer' && (
+    <li>
+      <Link to="/workers">Browse Workers</Link>
+    </li>
+  )}
 
-            <li>
-              <Link to="/jobs">Find Jobs</Link>
-            </li>
+  {user?.role === 'worker' && (
+    <li>
+      <Link to="/jobs">Find Jobs</Link>
+    </li>
+  )}
 
-            <li>
-              <Link to="/how-it-works">How It Works</Link>
-            </li>
-          </ul>
+  <li>
+    <Link to="/how-it-works">How It Works</Link>
+  </li>
+
+  {user && (
+    <li>
+      <Link to="/chat">Messages</Link>
+    </li>
+  )}
+</ul>
 
           {/* Desktop buttons */}
           <div className="navbar-actions">
@@ -411,21 +421,31 @@ function Navbar({ user, onLogout }) {
         }`}
       >
 
-        <a onClick={() => handleNavClick('/')}>
-          🏠 Home
-        </a>
+       <a onClick={() => handleNavClick('/')}>
+  🏠 Home
+</a>
 
-        <a onClick={() => handleNavClick('/workers')}>
-          👷 Browse Workers
-        </a>
+{user?.role === 'employer' && (
+  <a onClick={() => handleNavClick('/workers')}>
+    👷 Browse Workers
+  </a>
+)}
 
-        <a onClick={() => handleNavClick('/jobs')}>
-          💼 Find Jobs
-        </a>
+{user?.role === 'worker' && (
+  <a onClick={() => handleNavClick('/jobs')}>
+    💼 Find Jobs
+  </a>
+)}
 
-        <a onClick={() => handleNavClick('/how-it-works')}>
-          ❓ How It Works
-        </a>
+<a onClick={() => handleNavClick('/how-it-works')}>
+  ❓ How It Works
+</a>
+
+{user && (
+  <a onClick={() => handleNavClick('/chat')}>
+    💬 Messages
+  </a>
+)}
 
         {user ? (
           <>

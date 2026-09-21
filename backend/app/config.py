@@ -18,6 +18,7 @@ class Settings(BaseSettings):
 
     firebase_credentials_path: str = "/etc/secrets/firebase-service-account.json"
     firebase_credentials_json: str = ""
+    firebase_storage_bucket: str = ""
 
     firestore_users_collection: str = "users"
     firestore_jobs_collection: str = "jobs"

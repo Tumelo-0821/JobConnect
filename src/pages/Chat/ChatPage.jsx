@@ -1,142 +1,404 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar/Navbar';
+import { api } from '../../services/api';
 import './Chat.css';
 
 function ChatPage({ user, onLogout }) {
   const navigate = useNavigate();
-  const { workerId } = useParams();
 
+const { id, workerId, userId, conversationId } = useParams();
+
+const otherUserId = workerId || userId || id;
+
+  const [conversation, setConversation] = useState(null);
+  const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
 
-  // Temporary messages for testing the chat interface.
-  // We will replace this with the backend later.
-  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState('');
 
-  if (!user) {
-    navigate('/login');
-    return null;
-  }
+  const messagesEndRef = useRef(null);
 
-  function handleSendMessage(e) {
+  // ---------------------------------------------------------
+  // REDIRECT IF NOT LOGGED IN
+  // ---------------------------------------------------------
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
+
+  // ---------------------------------------------------------
+  // LOAD CONVERSATION
+  // ---------------------------------------------------------
+
+  useEffect(() => {
+    if (!user) return;
+
+    let cancelled = false;
+
+    async function loadConversation() {
+      try {
+        setLoading(true);
+        setError('');
+
+        let conversationData;
+
+        // If a conversation ID was supplied, load it directly.
+        if (conversationId) {
+          conversationData = await api.getConversation(conversationId);
+        } else {
+          // Otherwise get/create a conversation with the other user.
+          if (!otherUserId) {
+            throw new Error(
+              'No user was specified for this conversation.'
+            );
+          }
+
+          conversationData =
+            await api.getOrCreateConversation(otherUserId);
+        }
+
+        if (cancelled) return;
+
+        setConversation(conversationData);
+
+        // Load messages.
+        const messageData = await api.getMessages(
+          conversationData.id
+        );
+
+        if (cancelled) return;
+
+        setMessages(messageData || []);
+
+        // Mark incoming messages as read.
+        try {
+          await api.markConversationAsRead(
+            conversationData.id
+          );
+        } catch (readError) {
+          console.warn(
+            'Could not mark messages as read:',
+            readError
+          );
+        }
+      } catch (err) {
+        console.error('Failed to load chat:', err);
+
+        if (!cancelled) {
+          setError(
+            err.message ||
+              'Unable to load this conversation.'
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadConversation();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user, otherUserId, conversationId]);
+
+  // ---------------------------------------------------------
+  // REFRESH MESSAGES
+  // ---------------------------------------------------------
+
+  useEffect(() => {
+    if (!conversation?.id) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const messageData = await api.getMessages(
+          conversation.id
+        );
+
+        setMessages(messageData || []);
+      } catch (err) {
+        console.warn(
+          'Could not refresh messages:',
+          err
+        );
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [conversation?.id]);
+
+  // ---------------------------------------------------------
+  // AUTO SCROLL
+  // ---------------------------------------------------------
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({
+      behavior: 'smooth',
+    });
+  }, [messages]);
+
+  // ---------------------------------------------------------
+  // SEND MESSAGE
+  // ---------------------------------------------------------
+
+  async function handleSendMessage(e) {
     e.preventDefault();
 
     const trimmedMessage = message.trim();
 
-    if (!trimmedMessage) return;
+    if (
+      !trimmedMessage ||
+      !conversation ||
+      sending
+    ) {
+      return;
+    }
 
-    const newMessage = {
-      id: Date.now(),
-      senderId: user.id,
-      senderName: user.name,
-      text: trimmedMessage,
-      timestamp: new Date().toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-    };
+    try {
+      setSending(true);
+      setError('');
 
-    setMessages(prev => [...prev, newMessage]);
-    setMessage('');
+      const newMessage = await api.sendMessage(
+        conversation.id,
+        trimmedMessage
+      );
+
+      setMessages((prev) => [
+        ...prev,
+        newMessage,
+      ]);
+
+      setMessage('');
+    } catch (err) {
+      console.error(
+        'Failed to send message:',
+        err
+      );
+
+      setError(
+        err.message ||
+          'Unable to send your message.'
+      );
+    } finally {
+      setSending(false);
+    }
   }
+
+  // ---------------------------------------------------------
+  // FORMAT TIME
+  // ---------------------------------------------------------
+
+  function formatMessageTime(timestamp) {
+    if (!timestamp) return '';
+
+    const date = new Date(timestamp);
+
+    if (Number.isNaN(date.getTime())) {
+      return '';
+    }
+
+    return date.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  // ---------------------------------------------------------
+  // OTHER USER ROLE
+  // ---------------------------------------------------------
+
+  function getOtherUserRole() {
+    if (!conversation || !user) {
+      return '';
+    }
+
+    return conversation.employer_id === user.id
+      ? 'Worker'
+      : 'Employer';
+  }
+
+  // ---------------------------------------------------------
+  // BACK BUTTON
+  // ---------------------------------------------------------
+
+  function handleBack() {
+    navigate(
+      user?.role === 'worker'
+        ? '/worker-dashboard'
+        : '/employer-dashboard'
+    );
+  }
+
+  // ---------------------------------------------------------
+  // LOADING
+  // ---------------------------------------------------------
+
+  if (!user) {
+    return null;
+  }
+
+  if (loading) {
+    return (
+      <div className="chat-page">
+        <Navbar
+          user={user}
+          onLogout={onLogout}
+        />
+
+        <div className="chat-container">
+          <div className="chat-loading">
+            Loading conversation...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ---------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------
 
   return (
     <div className="chat-page">
-      <Navbar user={user} onLogout={onLogout} />
+      <Navbar
+        user={user}
+        onLogout={onLogout}
+      />
 
       <div className="chat-container">
 
-        {/* Chat Header */}
+        {/* CHAT HEADER */}
         <div className="chat-header">
+
           <button
             className="chat-back-btn"
-            onClick={() =>
-              navigate(
-                user.role === 'worker'
-                  ? '/worker-dashboard'
-                  : '/employer-dashboard'
-              )
-            }
+            onClick={handleBack}
+            type="button"
+            aria-label="Go back"
           >
             ←
           </button>
 
           <div className="chat-user-avatar">
-            {user.role === 'employer' ? '👷' : '🏢'}
+            {getOtherUserRole() === 'Worker'
+              ? '👤'
+              : '🏢'}
           </div>
 
           <div className="chat-user-info">
             <h3>
-              {user.role === 'employer'
-                ? 'Worker'
-                : 'Employer'}
+              {getOtherUserRole()}
             </h3>
 
             <span>
-              {user.role === 'employer'
-                ? 'JobConnect Worker'
-                : 'JobConnect Employer'}
+              JobConnect {getOtherUserRole()}
             </span>
           </div>
+
         </div>
 
-        {/* Messages */}
+        {/* ERROR */}
+        {error && (
+          <div className="chat-error">
+            {error}
+          </div>
+        )}
+
+        {/* MESSAGES */}
         <div className="chat-messages">
 
           {messages.length === 0 ? (
             <div className="chat-welcome">
-              <div className="chat-empty-icon">💬</div>
 
-              <h3>Start a conversation</h3>
+              <div className="chat-empty-icon">
+                💬
+              </div>
+
+              <h3>
+                Start a conversation
+              </h3>
 
               <p>
-                Discuss the job, working hours, location,
-                responsibilities and any other important details.
+                Discuss the job, working hours,
+                location, responsibilities and
+                any other important details.
               </p>
+
             </div>
           ) : (
-            messages.map(msg => {
-              const isMine = msg.senderId === user.id;
+            messages.map((msg) => {
+
+              const isMine =
+                msg.sender_id === user.id;
 
               return (
                 <div
                   key={msg.id}
                   className={`message-row ${
-                    isMine ? 'message-mine' : 'message-theirs'
+                    isMine
+                      ? 'message-mine'
+                      : 'message-theirs'
                   }`}
                 >
+
                   <div className="message-bubble">
-                    <div>{msg.text}</div>
+
+                    <div>
+                      {msg.message}
+                    </div>
 
                     <span className="message-time">
-                      {msg.timestamp}
+                      {formatMessageTime(
+                        msg.created_at
+                      )}
                     </span>
+
                   </div>
+
                 </div>
               );
             })
           )}
 
+          <div ref={messagesEndRef} />
+
         </div>
 
-        {/* Message Input */}
+        {/* MESSAGE INPUT */}
         <form
           className="chat-input-area"
           onSubmit={handleSendMessage}
         >
+
           <input
             type="text"
             placeholder="Type your message..."
             value={message}
-            onChange={e => setMessage(e.target.value)}
+            onChange={(e) =>
+              setMessage(e.target.value)
+            }
+            maxLength={2000}
+            disabled={sending}
           />
 
           <button
             type="submit"
-            disabled={!message.trim()}
+            disabled={
+              !message.trim() ||
+              !conversation ||
+              sending
+            }
           >
-            Send
+            {sending ? 'Sending...' : 'Send'}
           </button>
+
         </form>
 
       </div>

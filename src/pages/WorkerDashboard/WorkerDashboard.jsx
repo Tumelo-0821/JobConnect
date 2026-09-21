@@ -408,28 +408,61 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
               )}
             </div>
 
-            <div className="section-card" style={{ marginTop: '20px' }}>
-              <div className="section-card-header">
-                <h3><FaClipboardList/> My Applications</h3>
-              </div>
 
-              {applications.length === 0 ? (
-                <p style={{ padding: '16px', color: '#6b7280' }}>You haven't applied to any jobs yet.</p>
-              ) : (
-                applications.map(app => (
-                  <div key={app.id} className="applied-job-row">
-                    <div className="applied-job-info">
-                      <div className="job-title">{app.job_title}</div>
-                    </div>
-                    <span className={`status-badge ${app.status}`}>
-                      {app.status === 'pending' && '⏳ Pending'}
-                      {app.status === 'approved' && '✅ Approved'}
-                      {app.status === 'rejected' && '❌ Not Selected'}
-                    </span>
-                  </div>
-                ))
-              )}
-            </div>
+<div className="section-card" style={{ marginTop: '20px' }}>
+  <div className="section-card-header">
+    <h3><FaClipboardList /> My Applications</h3>
+  </div>
+
+  {applications.length === 0 ? (
+    <p style={{ padding: '16px', color: '#6b7280' }}>
+      You haven't applied to any jobs yet.
+    </p>
+  ) : (
+    applications.map(app => (
+      <div key={app.id} className="applied-job-row">
+        
+        <div className="applied-job-info">
+          <div className="job-title">{app.job_title}</div>
+        </div>
+
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+
+          <span className={`status-badge ${app.status}`}>
+            {app.status === 'pending' && '⏳ Pending'}
+            {app.status === 'approved' && '✅ Approved'}
+            {app.status === 'hired' && '✅ Hired'}
+            {app.status === 'rejected' && '❌ Not Selected'}
+          </span>
+
+          {app.employer_id && (
+            <button
+              type="button"
+              onClick={() => navigate(`/chat/${app.employer_id}`)}
+              style={{
+                border: 'none',
+                borderRadius: '20px',
+                padding: '8px 16px',
+                background: '#1a6fc4',
+                color: 'white',
+                fontWeight: '600',
+                cursor: 'pointer'
+              }}
+            >
+              💬 Message Employer
+            </button>
+          )}
+
+        </div>
+
+      </div>
+    ))
+  )}
+</div>
           </div>
         </div>
       </div>

@@ -299,3 +299,69 @@ class NotificationDocument:
             "is_read": bool(data.get("is_read", False)),
             "created_at": data.get("created_at"),
         }
+
+class ConversationDocument:
+    """Firestore conversation document shape."""
+
+    @staticmethod
+    def create(
+        *,
+        employer_id: str,
+        worker_id: str,
+    ) -> dict[str, Any]:
+        now = utc_now()
+
+        return {
+            "employer_id": employer_id,
+            "worker_id": worker_id,
+            "created_at": now,
+            "updated_at": now,
+        }
+
+    @staticmethod
+    def to_response(
+        doc_id: str,
+        data: dict[str, Any],
+    ) -> dict[str, Any]:
+        return {
+            "id": doc_id,
+            "employer_id": data.get("employer_id"),
+            "worker_id": data.get("worker_id"),
+            "created_at": data.get("created_at"),
+            "updated_at": data.get("updated_at"),
+        }
+
+
+class MessageDocument:
+    """Firestore chat message document shape."""
+
+    @staticmethod
+    def create(
+        *,
+        conversation_id: str,
+        sender_id: str,
+        message: str,
+    ) -> dict[str, Any]:
+        now = utc_now()
+
+        return {
+            "conversation_id": conversation_id,
+            "sender_id": sender_id,
+            "message": message.strip(),
+            "is_read": False,
+            "created_at": now,
+        }
+
+    @staticmethod
+    def to_response(
+        doc_id: str,
+        data: dict[str, Any],
+    ) -> dict[str, Any]:
+        return {
+            "id": doc_id,
+            "conversation_id": data.get("conversation_id"),
+            "sender_id": data.get("sender_id"),
+            "message": data.get("message"),
+            "is_read": bool(data.get("is_read", False)),
+            "created_at": data.get("created_at"),
+        }

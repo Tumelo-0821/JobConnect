@@ -251,4 +251,56 @@ async getJobApplications(jobId) {
       method: 'PATCH',
     });
   },
+
+  // ---------------------------------------------------------
+// CHAT
+// ---------------------------------------------------------
+
+async getConversations() {
+return request('/chat/conversations');
+},
+
+async getOrCreateConversation(userId) {
+return request(`/chat/conversations/${userId}`, {
+method: 'POST',
+});
+},
+
+async getConversation(conversationId) {
+return request(`/chat/conversations/${conversationId}`);
+},
+
+async getMessages(conversationId) {
+return request(
+`/chat/conversations/${conversationId}/messages`
+);
+},
+
+async sendMessage(conversationId, message) {
+return request(
+`/chat/conversations/${conversationId}/messages`,
+{
+method: 'POST',
+body: JSON.stringify({
+message,
+}),
+}
+);
+},
+
+async markMessageAsRead(messageId) {
+return request(`/chat/messages/${messageId}/read`, {
+method: 'PATCH',
+});
+},
+
+async markConversationAsRead(conversationId) {
+return request(
+`/chat/conversations/${conversationId}/read`,
+{
+method: 'PATCH',
+}
+);
+},
+
 };

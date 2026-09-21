@@ -5,6 +5,7 @@ from app.dependencies import (
     get_current_worker,
     get_job_repository,
     get_user_repository,
+    get_notification_repository
 )
 from app.repositories.memory import ApplicationRepository, JobRepository, UserRepository
 from app.schemas.application import ApplicationResponse
@@ -24,7 +25,12 @@ def get_application_service(
     job_repo: JobRepository = Depends(get_job_repository),
     user_repo: UserRepository = Depends(get_user_repository),
 ) -> ApplicationService:
-    return ApplicationService(app_repo, job_repo, user_repo)
+    return ApplicationService(
+    app_repo,
+    job_repo,
+    user_repo,
+    get_notification_repository(),
+)
 
 
 @router.get(
