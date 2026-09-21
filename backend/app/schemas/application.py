@@ -26,6 +26,8 @@ class ApplicationResponse(BaseModel):
     worker_skills: list[str] = []
     worker_bio: str | None = None
     worker_province: str | None = None
+    worker_cv_file_name: str | None = None
+    worker_cv_available: bool = False
 
     status: ApplicationStatus
     created_at: datetime | None = None
@@ -34,3 +36,4 @@ class ApplicationResponse(BaseModel):
 
 class ApplicationStatusUpdate(BaseModel):
     status: ApplicationStatus
+    rejection_message: str | None = None

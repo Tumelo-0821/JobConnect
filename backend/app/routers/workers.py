@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, File, UploadFile, Query
+from app.services.cv_service import CVService
 
 from app.dependencies import (
     get_current_worker,
@@ -19,6 +20,11 @@ router = APIRouter(prefix="/workers", tags=["Workers"])
 
 def get_worker_service(user_repo: UserRepository = Depends(get_user_repository)) -> WorkerService:
     return WorkerService(user_repo)
+
+def get_cv_service(
+    user_repo: UserRepository = Depends(get_user_repository),
+) -> CVService:
+    return CVService(user_repo)
 
 
 def get_application_service(
@@ -72,6 +78,19 @@ def update_worker_profile(
 ) -> UserPublic:
     return worker_service.update_profile(worker, payload)
 
+@router.post(
+    "/me/cv",
+    summary="Upload worker CV",
+)
+async def upload_worker_cv(
+    file: UploadFile = File(...),
+    worker: dict = Depends(get_current_worker),
+    cv_service: CVService = Depends(get_cv_service),
+) -> dict:
+    return await cv_service.upload_cv(
+        worker,
+        file,
+    )
 
 @router.get(
     "/me/applications",

@@ -29,6 +29,10 @@ class Settings(BaseSettings):
     twilio_auth_token: str = ""
     twilio_phone_number: str = ""
 
+    smsportal_client_id: str = ""
+    smsportal_api_secret: str = ""
+    smsportal_url: str = "https://rest.smsportal.com/bulkmessages"
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [

@@ -24,6 +24,18 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
   const [error, setError] = useState('');
   const [applyingId, setApplyingId] = useState(null);
 
+  function formatRand(value) {
+  if (!value) return 'Not specified';
+
+  const text = String(value).trim();
+
+  if (/^R/i.test(text)) {
+    return text;
+  }
+
+  return `R${text}`;
+}
+
   useEffect(() => {
     if (!user || user.role !== 'worker') return;
 
@@ -294,7 +306,7 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
                         </span>
 
                         <span className="job-meta-item">
-                          <FaMoneyBillWave /> {job.pay || job.budget}
+                           {formatRand(job.pay || job.budget)}
                         </span>
 
                         {job.duration && (
@@ -302,6 +314,14 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
                             🕐 {job.duration}
                           </span>
                         )}
+                      </div>
+
+                      <div className="job-description">
+                        <h4>Job Description</h4>
+
+                        <p>
+                          {job.description || 'No job description provided.'}
+                        </p>
                       </div>
 
                       <div className="job-card-actions">
@@ -369,7 +389,7 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
                           </span>
 
                           <span className="job-meta-item">
-                            <FaMoneyBillWave /> {job.pay || job.budget}
+                            <FaMoneyBillWave /> {formatRand(job.pay || job.budget)}
                           </span>
 
                           {job.duration && (
@@ -377,6 +397,14 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
                               🕐 {job.duration}
                             </span>
                           )}
+                        </div>
+                        
+                        <div className="job-description">
+                          <h4>Job Description</h4>
+
+                          <p>
+                            {job.description || 'No job description provided.'}
+                          </p>
                         </div>
 
                       <div className="job-card-actions">
