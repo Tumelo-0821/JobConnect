@@ -13,6 +13,8 @@ import {
   FaStar,
   FaHandPaper,
   FaMapMarker,
+  FaCalendarAlt,
+  FaClock,
 } from "react-icons/fa";
 
 function WorkerDashboard({ user, onLogout, authLoading }) {
@@ -35,6 +37,39 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
 
   return `R${text}`;
 }
+
+  function formatClosingDate(value) {
+    if (!value) return 'Closing date unavailable';
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return 'Closing date unavailable';
+    }
+
+    return new Intl.DateTimeFormat('en-ZA', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      timeZone: 'Africa/Johannesburg',
+    }).format(date);
+  }
+
+  function isJobUnavailable(job) {
+    if (String(job.status || '').toLowerCase() === 'closed') {
+      return true;
+    }
+
+    if (!job.closing_date) return false;
+
+    const deadline = new Date(job.closing_date);
+
+    return (
+      !Number.isNaN(deadline.getTime()) &&
+      deadline.getTime() <= Date.now()
+    );
+  }
+
 
   useEffect(() => {
     if (!user || user.role !== 'worker') return;
@@ -137,10 +172,29 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
     (completionTasks.filter(t => t.done).length / completionTasks.length) * 100
   );
 
+  
   function getJobBadge(job) {
-    if (job.urgency === 'urgent') return { className: 'urgent', label: '🔥 Urgent' };
-    return { className: 'new', label: '🆕 New' };
+    if (isJobUnavailable(job)) {
+      return { className: 'closed', label: 'Applications Closed' };
+    }
+
+    const urgency = String(job.urgency || '').toLowerCase();
+
+    if (urgency === 'urgent') {
+      return { className: 'urgent', label: 'Urgent' };
+    }
+
+    if (urgency === 'soon') {
+      return { className: 'soon', label: 'Closing Soon' };
+    }
+
+    if (urgency === 'normal') {
+      return { className: 'normal', label: 'Normal' };
+    }
+
+    return { className: 'new', label: 'New Job' };
   }
+
 
   return (
     <div className="dashboard-page">
@@ -314,6 +368,12 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
                             🕐 {job.duration}
                           </span>
                         )}
+                        
+                         <span className="job-meta-item job-closing-date">
+                             <FaCalendarAlt />
+                             Closes: {formatClosingDate(job.closing_date)}
+                          </span>
+
                       </div>
 
                       <div className="job-description">
@@ -397,6 +457,12 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
                               🕐 {job.duration}
                             </span>
                           )}
+                                                    
+                            <span className="job-meta-item job-closing-date">
+                              <FaCalendarAlt />
+                              Closes: {formatClosingDate(job.closing_date)}
+                            </span>
+
                         </div>
                         
                         <div className="job-description">
@@ -412,8 +478,10 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
                           className="apply-btn"
                           onClick={() => handleApply(job.id)}
                           disabled={
+                            isJobUnavailable(job) ||
                             appliedIds.includes(job.id) ||
-                            applyingId === job.id
+                            applyingId === job.id ||
+                            !user.verified
                           }
                           title={
                             !user.verified
@@ -421,7 +489,9 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
                               : ''
                           }
                         >
-                          {appliedIds.includes(job.id)
+                          {isJobUnavailable(job)
+                            ? 'Applications Closed'
+                            : appliedIds.includes(job.id)
                             ? '✅ Applied'
                             : applyingId === job.id
                             ? 'Applying...'
