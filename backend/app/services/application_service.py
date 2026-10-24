@@ -1,4 +1,6 @@
-from fastapi import HTTPException, status
+from datetime import datetime, timezone
+
+from fastapi import HTTPException, status  # type: ignore[reportMissingImports]
 
 from app.models import ApplicationDocument, JobStatus
 from app.repositories.memory import ApplicationRepository, JobRepository, UserRepository
@@ -35,7 +37,37 @@ class ApplicationService:
                 detail="Job not found",
             )
 
-        _, job_data = job_result
+        job_doc_id, job_data = job_result
+
+        # Check whether the job's closing deadline has passed.
+        closing_date = job_data.get("closing_date")
+
+        if closing_date is not None:
+            # Treat older datetimes without a timezone as UTC.
+            if (
+                closing_date.tzinfo is None
+                or closing_date.utcoffset() is None
+            ):
+                closing_date = closing_date.replace(
+                    tzinfo=timezone.utc
+                )
+            else:
+                closing_date = closing_date.astimezone(timezone.utc)
+
+            if closing_date <= datetime.now(timezone.utc):
+                # Automatically close an expired job.
+                if job_data.get("status") == JobStatus.OPEN.value:
+                    self.job_repo.update(
+                        job_doc_id,
+                        {"status": JobStatus.CLOSED.value},
+                    )
+
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="This job has expired and is no longer accepting applications.",
+                )
+
+        # Reject jobs that were closed manually or previously.
         if job_data.get("status") != JobStatus.OPEN.value:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
