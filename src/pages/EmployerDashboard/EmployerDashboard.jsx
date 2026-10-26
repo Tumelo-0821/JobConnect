@@ -47,6 +47,29 @@ function EmployerDashboard({ user, onLogout, authLoading }) {
   return `R${text}`;
 }
 
+const formatClosingDate = (closingDate) => {
+  if (!closingDate) {
+    return 'No closing date set';
+  }
+
+  const date = new Date(closingDate);
+
+  if (Number.isNaN(date.getTime())) {
+    return 'Closing date unavailable';
+  }
+
+  return date.toLocaleString('en-ZA', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'Africa/Johannesburg',
+  });
+};
+
+
   useEffect(() => {
     if (!user || user.role !== 'employer') return;
 
@@ -511,6 +534,9 @@ function EmployerDashboard({ user, onLogout, authLoading }) {
                              {formatRand(job.pay || job.budget)}
                            
                           </span>
+                          
+                          
+
 
                           <span>
                             <FaUsers />{' '}
@@ -530,6 +556,25 @@ function EmployerDashboard({ user, onLogout, authLoading }) {
                           </span>
 
                         </div>
+                        
+                        <div
+                          className="job-closing-date"
+                          style={{
+                            marginTop: '8px',
+                            fontSize: '0.85rem',
+                            color: '#64748b',
+                            lineHeight: '1.5',
+                          }}
+                        >
+                         <div style={{ fontWeight: 'bold' }}>
+                              🗓️ Applications close:
+                            </div>
+
+                            <div style={{ fontWeight: 'bold', paddingLeft: '20px' }}>
+                              {formatClosingDate(job.closing_date)}
+                            </div>
+                        </div>
+
                       </div>
 
                       <div className="posted-job-actions">
@@ -549,6 +594,13 @@ function EmployerDashboard({ user, onLogout, authLoading }) {
                               : 'Close'}
                           </button>
                         )}
+                        <button
+                          type="button"
+                          className="chat-job-btn"
+                          onClick={() => {}}
+                        >
+                          💬 Chat
+                        </button>
 
                       </div>
 

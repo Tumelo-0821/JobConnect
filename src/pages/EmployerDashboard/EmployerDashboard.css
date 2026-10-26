@@ -175,9 +175,10 @@
 
 .posted-job-actions {
   display: flex;
+  flex-direction: column;
   gap: 8px;
+  align-items: stretch;
 }
-
 .view-apps-btn {
   background: #e8f1fb;
   color: #1a6fc4;
@@ -205,6 +206,22 @@
 }
 
 .close-job-btn:hover { background: #fecaca; }
+/*chats*/
+.chat-job-btn {
+  background: #e8f1fb;
+  color: #1a6fc4;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.chat-job-btn:hover {
+  background: #d4e6fa;
+}
 
 /* Worker search */
 .search-bar {
@@ -852,3 +869,6 @@
     width: 100%;
   }
 }
+/*............*/
+
+

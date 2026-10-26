@@ -37,7 +37,26 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
 
   return `R${text}`;
 }
+const formatClosingDate = (closingDate) => {
+  if (!closingDate) return "Closing date unavailable";
 
+  const date = new Date(closingDate);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Closing date unavailable";
+  }
+
+  return date.toLocaleString("en-ZA", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "Africa/Johannesburg",
+  });
+};
+{/*
   function formatClosingDate(value) {
     if (!value) return 'Closing date unavailable';
 
@@ -54,7 +73,7 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
       timeZone: 'Africa/Johannesburg',
     }).format(date);
   }
-
+*/}
   function isJobUnavailable(job) {
     if (String(job.status || '').toLowerCase() === 'closed') {
       return true;
@@ -406,7 +425,14 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
                             ? <><FaHandPaper /> Apply Now</>
                             : '🔒 Verify ID to Apply'}
                         </button>
-                      </div>
+                      <button
+                          type="button"
+                          className="chat-negotiate-btn"
+                          onClick={() => {}}
+                        >
+                          💬 Chat &amp; Negotiate
+                        </button>
+                        </div>
                     </div>
                   );
                 })
@@ -498,6 +524,14 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
                             : user.verified
                             ? <><FaHandPaper /> Apply Now</>
                             : '🔒 Verify ID to Apply'}
+                        </button>
+
+                        <button
+                          type="button"
+                          className="chat-negotiate-btn"
+                          onClick={() => {}}
+                        >
+                          💬 Chat &amp; Negotiate
                         </button>
                       </div>
                     </div>
