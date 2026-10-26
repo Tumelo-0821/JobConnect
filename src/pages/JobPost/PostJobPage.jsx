@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar/Navbar';
@@ -35,6 +34,7 @@ function PostJobPage({ user, onLogout }) {
     province: '',
     duration: '',
     closing_date: '',
+    closing_time: '23:59',
   });
 
   if (!user) {
@@ -63,24 +63,23 @@ function PostJobPage({ user, onLogout }) {
       return;
     }
 
-    if (!formData.closing_date) {
-      setError('Please select a closing date for this job.');
+    if (!formData.closing_date || !formData.closing_time) {
+      setError('Please select an application closing date and time.');
       return;
     }
 
-    // A selected date remains valid until 23:59:59
-    // in South Africa (UTC+02:00).
+    // Interpret the employer-selected date and time as South African time (UTC+02:00).
     const closingDate = new Date(
-      `${formData.closing_date}T23:59:59+02:00`
+      `${formData.closing_date}T${formData.closing_time}:00+02:00`
     );
 
     if (Number.isNaN(closingDate.getTime())) {
-      setError('Please select a valid closing date.');
+      setError('Please select a valid closing date and time.');
       return;
     }
 
     if (closingDate.getTime() <= Date.now()) {
-      setError('The closing date must be in the future.');
+      setError('The application closing date and time must be in the future.');
       return;
     }
 
@@ -92,6 +91,9 @@ function PostJobPage({ user, onLogout }) {
         ...formData,
         closing_date: closingDate.toISOString(),
       };
+
+      // The backend receives one UTC timestamp, not a separate closing_time field.
+      delete jobData.closing_time;
 
       // Urgency is calculated automatically by the backend.
       delete jobData.urgency;
@@ -282,24 +284,41 @@ function PostJobPage({ user, onLogout }) {
                 </div>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="closing_date">
-                  Application Closing Date *
-                </label>
-                <input
-                  id="closing_date"
-                  type="date"
-                  name="closing_date"
-                  value={formData.closing_date}
-                  onChange={handleChange}
-                  min={getSouthAfricanToday()}
-                  required
-                />
-                <small>
-                  Applications close at 23:59 South African time on this date.
-                  Urgency will update automatically as the deadline approaches.
-                </small>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="closing_date">
+                    Application Closing Date *
+                  </label>
+                  <input
+                    id="closing_date"
+                    type="date"
+                    name="closing_date"
+                    value={formData.closing_date}
+                    onChange={handleChange}
+                    min={getSouthAfricanToday()}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="closing_time">
+                    Application Closing Time *
+                  </label>
+                  <input
+                    type="time"
+                    id="closing_time"
+                    name="closing_time"
+                    value={formData.closing_time}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
               </div>
+
+              <small>
+                Select the exact date and South African time when applications
+                should close. Urgency updates automatically as the deadline approaches.
+              </small>
 
               <button
                 type="submit"

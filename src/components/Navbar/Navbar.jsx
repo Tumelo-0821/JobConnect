@@ -176,12 +176,12 @@ function Navbar({ user, onLogout }) {
         <div className="navbar-inner">
 
           {/* Logo */}
-          <Link to="/" className="navbar-logo">
-            <div className="logo-icon">
-              <span>🔨</span>
-            </div>
-            JobConnect SA
-          </Link>
+           <Link to="/" className="navbar-logo">
+               <div className="logo-icon">
+                <img src="/logo.png" alt="JobConnect SA logo" />
+               </div>
+                JobConnect SA
+            </Link>
 
           {/* Desktop links */}
           <ul className="navbar-links">
