@@ -1,7 +1,10 @@
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1';
+const API_BASE =
+  process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1';
 
 const TOKEN_KEY = 'jobconnect_token';
 const USER_KEY = 'jobconnect_user';
+
+// -------------------- AUTH STORAGE --------------------
 
 export function getToken() {
   return localStorage.getItem(TOKEN_KEY);
@@ -9,7 +12,9 @@ export function getToken() {
 
 export function getStoredUser() {
   const raw = localStorage.getItem(USER_KEY);
+
   if (!raw) return null;
+
   try {
     return JSON.parse(raw);
   } catch {
@@ -27,16 +32,23 @@ export function clearAuth() {
   localStorage.removeItem(USER_KEY);
 }
 
+// -------------------- API REQUEST HELPER --------------------
+
 async function request(path, options = {}) {
   const headers = {
     ...(options.headers || {}),
   };
 
-  if (!(options.body instanceof FormData)) {
+  const isFormData =
+    typeof FormData !== 'undefined' &&
+    options.body instanceof FormData;
+
+  if (options.body !== undefined && !isFormData) {
     headers['Content-Type'] = 'application/json';
   }
 
   const token = getToken();
+
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }
@@ -47,36 +59,39 @@ async function request(path, options = {}) {
   });
 
   let data = null;
-  const text = await response.text();
-  if (text) {
+  const responseText = await response.text();
+
+  if (responseText) {
     try {
-      data = JSON.parse(text);
+      data = JSON.parse(responseText);
     } catch {
-      data = { detail: text };
+      data = { detail: responseText };
     }
   }
 
- if (!response.ok) {
-  let message = 'Request failed';
+  if (!response.ok) {
+    let message = 'Request failed';
 
-  if (data?.detail) {
-    if (typeof data.detail === 'string') {
-      message = data.detail;
-    } else if (Array.isArray(data.detail)) {
-      message = data.detail
-        .map((error) => {
-          const field = error.loc?.slice(1).join('.') || 'field';
-          return `${field}: ${error.msg}`;
-        })
-        .join(', ');
+    if (data?.detail) {
+      if (typeof data.detail === 'string') {
+        message = data.detail;
+      } else if (Array.isArray(data.detail)) {
+        message = data.detail
+          .map(error => {
+            const field = error.loc?.slice(1).join('.') || 'field';
+            return `${field}: ${error.msg}`;
+          })
+          .join(', ');
+      }
     }
-  }
 
-  throw new Error(message);
-}
+    throw new Error(message);
+  }
 
   return data;
 }
+
+// -------------------- USER MAPPING --------------------
 
 function mapUser(user) {
   if (!user) return null;
@@ -86,7 +101,8 @@ function mapUser(user) {
     name: user.name,
     email: user.email,
     role: user.role,
-    verified: user.verified,
+    account_verified: user.account_verified ?? false,
+    verified: user.verified ?? false,
     province: user.province,
     phone: user.phone,
     skills: user.skills || [],
@@ -98,43 +114,98 @@ function mapUser(user) {
   };
 }
 
+// -------------------- API METHODS --------------------
+
 export const api = {
-  async register(formData, role) {
-    const data = await request('/auth/register', {
+  // -------------------- AUTHENTICATION --------------------
+
+  async register(formData, role, verificationMethod) {
+    return request('/auth/register', {
       method: 'POST',
-     body: JSON.stringify({
-        role: role,
+      body: JSON.stringify({
+        role,
         first_name: formData.firstName,
-        last_name: formData.lastName,
+        last_name: formData.lastName || null,
         email: formData.email,
         phone: formData.phone || null,
         province: formData.city || null,
-        id_number: role === 'worker' ? formData.idNumber || null : null,
         password: formData.password,
+        verification_method: verificationMethod,
       }),
     });
+  },
+
+  async verifyRegistrationOtp(challengeId, otp) {
+    const data = await request('/auth/register/otp/verify', {
+      method: 'POST',
+      body: JSON.stringify({
+        challenge_id: challengeId,
+        otp,
+      }),
+    });
+
     const user = mapUser(data.user);
+
     saveAuth(data.access_token, user);
-    return { token: data.access_token, user };
+
+    return {
+      token: data.access_token,
+      user,
+    };
+  },
+
+  async resendRegistrationOtp(challengeId) {
+    return request('/auth/register/otp/resend', {
+      method: 'POST',
+      body: JSON.stringify({
+        challenge_id: challengeId,
+      }),
+    });
   },
 
   async login(email, password) {
     const data = await request('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({
+        email,
+        password,
+      }),
     });
+
     const user = mapUser(data.user);
+
     saveAuth(data.access_token, user);
-    return { token: data.access_token, user };
+
+    return {
+      token: data.access_token,
+      user,
+    };
   },
 
   async getMe() {
     const data = await request('/auth/me');
     const user = mapUser(data);
+
     saveAuth(getToken(), user);
+
     return user;
   },
-    async getNotifications() {
+
+  async verifyAccount() {
+    const data = await request('/auth/verify', {
+      method: 'POST',
+    });
+
+    const user = mapUser(data);
+
+    saveAuth(getToken(), user);
+
+    return user;
+  },
+
+  // -------------------- NOTIFICATIONS --------------------
+
+  async getNotifications() {
     return request('/notifications');
   },
 
@@ -150,20 +221,83 @@ export const api = {
     });
   },
 
-  async verifyAccount() {
-    const data = await request('/auth/verify', { method: 'POST' });
-    const user = mapUser(data);
-    saveAuth(getToken(), user);
-    return user;
-  },
+  // -------------------- EMPLOYER JOBS --------------------
 
   async getEmployerJobs() {
-  return request('/employers/jobs');
-},
+    return request('/employers/jobs');
+  },
 
-async getEmployerApplications() {
-  return request('/employers/all-applications');
-},
+  async createJob(jobData) {
+    return request('/employers/jobs', {
+      method: 'POST',
+      body: JSON.stringify(jobData),
+    });
+  },
+
+  async closeJob(jobId) {
+    return request(`/employers/jobs/${jobId}/close`, {
+      method: 'POST',
+    });
+  },
+
+  // -------------------- EMPLOYER APPLICATIONS --------------------
+
+  async getEmployerApplications() {
+    return request('/employers/all-applications');
+  },
+
+  async getJobApplications(jobId) {
+    return request(`/employers/jobs/${jobId}/applications`);
+  },
+
+  async updateApplicationStatus(
+    jobId,
+    applicationId,
+    status,
+    rejectionMessage = null
+  ) {
+    return request(
+      `/employers/jobs/${jobId}/applications/${applicationId}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({
+          status,
+          rejection_message: rejectionMessage,
+        }),
+      }
+    );
+  },
+
+  async getEmployerApplicationStats() {
+    return request('/employers/stats/applications');
+  },
+
+  // -------------------- WORK COMPLETION AND REVIEWS --------------------
+
+  async markWorkCompleted(jobId, applicationId) {
+    return request(
+      `/employers/jobs/${jobId}/applications/${applicationId}/complete`,
+      {
+        method: 'POST',
+      }
+    );
+  },
+
+  async reviewWorker(jobId, applicationId, rating, review = '') {
+    return request(
+      `/employers/jobs/${jobId}/applications/${applicationId}/review`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          rating,
+          review,
+        }),
+      }
+    );
+  },
+
+  // -------------------- APPLICATION CV --------------------
+
   async getApplicationCV(jobId, applicationId) {
     const token = getToken();
 
@@ -171,9 +305,11 @@ async getEmployerApplications() {
       `${API_BASE}/employers/jobs/${jobId}/applications/${applicationId}/cv`,
       {
         method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: token
+          ? {
+              Authorization: `Bearer ${token}`,
+            }
+          : {},
       }
     );
 
@@ -184,10 +320,13 @@ async getEmployerApplications() {
         const data = await response.json();
 
         if (data?.detail) {
-          message = data.detail;
+          message =
+            typeof data.detail === 'string'
+              ? data.detail
+              : 'Failed to retrieve CV';
         }
       } catch {
-        // Response was not JSON.
+        // The response was not JSON.
       }
 
       throw new Error(message);
@@ -195,80 +334,18 @@ async getEmployerApplications() {
 
     return response.blob();
   },
-async getJobApplications(jobId) {
-  return request(`/employers/jobs/${jobId}/applications`);
-},
 
-  async createJob(jobData) {
-    return request('/employers/jobs', {
-      method: 'POST',
-      body: JSON.stringify(jobData),
-    });
-  },
-
-  async closeJob(jobId) {
-    return request(`/employers/jobs/${jobId}/close`, { method: 'POST' });
-  },
-
- async updateApplicationStatus(
-  jobId,
-  applicationId,
-  status,
-  rejectionMessage = null
-) {
-  return request(
-    `/employers/jobs/${jobId}/applications/${applicationId}`,
-    {
-      method: 'PATCH',
-      body: JSON.stringify({
-        status,
-        rejection_message: rejectionMessage,
-      }),
-    }
-  );
-},
-
-  async getEmployerApplicationStats() {
-    return request('/employers/stats/applications');
-  },
+  // -------------------- WORKERS --------------------
 
   async getWorkers(search = '', skill = '') {
     const params = new URLSearchParams();
+
     if (search) params.set('search', search);
     if (skill) params.set('skill', skill);
+
     const query = params.toString();
+
     return request(`/workers${query ? `?${query}` : ''}`);
-  },
-
-  async browseJobs(category = '', province = '') {
-    const params = new URLSearchParams();
-    if (category) params.set('category', category);
-    if (province) params.set('province', province);
-    const query = params.toString();
-    return request(`/jobs${query ? `?${query}` : ''}`);
-  },
-
-  async applyForJob(jobId) {
-    return request(`/jobs/${jobId}/apply`, { method: 'POST' });
-  },
-
-  async getMyApplications() {
-    return request('/workers/me/applications');
-  },
-    async getNotifications() {
-    return request('/notifications');
-  },
-
-  async markNotificationAsRead(notificationId) {
-    return request(`/notifications/${notificationId}/read`, {
-      method: 'PATCH',
-    });
-  },
-
-  async markAllNotificationsAsRead() {
-    return request('/notifications/read-all', {
-      method: 'PATCH',
-    });
   },
 
   async updateWorkerProfile(updates) {
@@ -276,13 +353,17 @@ async getJobApplications(jobId) {
       method: 'PATCH',
       body: JSON.stringify(updates),
     });
+
     const user = mapUser(data);
+
     saveAuth(getToken(), user);
+
     return user;
   },
 
-    async uploadWorkerCV(file) {
+  async uploadWorkerCV(file) {
     const formData = new FormData();
+
     formData.append('file', file);
 
     const data = await request('/workers/me/cv', {
@@ -304,19 +385,27 @@ async getJobApplications(jobId) {
 
     return data;
   },
-    async getNotifications() {
-    return request('/notifications');
+
+  async getMyApplications() {
+    return request('/workers/me/applications');
   },
 
-  async markNotificationAsRead(notificationId) {
-    return request(`/notifications/${notificationId}/read`, {
-      method: 'PATCH',
-    });
+  // -------------------- JOB BROWSING AND APPLICATIONS --------------------
+
+  async browseJobs(category = '', province = '') {
+    const params = new URLSearchParams();
+
+    if (category) params.set('category', category);
+    if (province) params.set('province', province);
+
+    const query = params.toString();
+
+    return request(`/jobs${query ? `?${query}` : ''}`);
   },
 
-  async markAllNotificationsAsRead() {
-    return request('/notifications/read-all', {
-      method: 'PATCH',
+  async applyForJob(jobId) {
+    return request(`/jobs/${jobId}/apply`, {
+      method: 'POST',
     });
   },
 };

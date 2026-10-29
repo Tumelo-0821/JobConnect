@@ -1,12 +1,14 @@
+import HowItWorks from './pages/HowItWorks';
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import './styles/global.css';
-
+import JobsPage from './pages/Jobs/JobsPage';
+import WorkersPage        from './pages/Workers/WorkersPage';
 import LandingPage        from './pages/LandingPage/LandingPage';
 import LoginPage          from './pages/Auth/LoginPage';
 import RegisterPage       from './pages/Auth/RegisterPage';
-import VerificationPage   from './pages/Verification/VerificationPage';
+import VerifyOtpPage      from './pages/Auth/VerifyOtpPage';
 import WorkerDashboard    from './pages/WorkerDashboard/WorkerDashboard';
 import WorkerProfile      from './pages/WorkerProfile/WorkerProfile';
 import EmployerDashboard  from './pages/EmployerDashboard/EmployerDashboard';
@@ -75,24 +77,28 @@ function App() {
         <Route path="/"            element={<LandingPage       {...sharedProps} />} />
         <Route path="/login"       element={<LoginPage         onLogin={handleLogin} />} />
         <Route path="/register"    element={<RegisterPage      onLogin={handleLogin} />} />
-        <Route path="/verification" element={<VerificationPage {...sharedProps} onLogin={handleLogin} />} />
+        
         <Route path="/worker-dashboard"   element={<WorkerDashboard   {...sharedProps} />} />
         <Route path="/worker-profile"     element={<WorkerProfile     {...sharedProps} />} />
         <Route path="/employer-dashboard" element={<EmployerDashboard {...sharedProps} />} />
         <Route path="/post-job" element={<PostJobPage {...sharedProps} />} />
-        <Route path="/jobs"     element={<ComingSoon pageName="Browse Jobs" />} />
-        <Route path="/workers"     element={<ComingSoon pageName="Browse Workers" />} />
+        <Route path="/jobs" element={<JobsPage {...sharedProps} />} />
+        <Route path="/workers"  element={<WorkersPage {...sharedProps} />}/>
         <Route path="/worker/:id"  element={<ComingSoon pageName="Worker Profile" />} />
         <Route path="/chat"    element={<ChatPage {...sharedProps} />} />
         <Route path="/chat/:id" element={<ChatPage {...sharedProps} />} />
-        <Route path="/how-it-works" element={<ComingSoon pageName="How It Works" />} />
+        <Route path="/how-it-works" element={<HowItWorks {...sharedProps} />}/>
         <Route path="/about"        element={<ComingSoon pageName="About Us" />} />
         <Route path="/support"      element={<ComingSoon pageName="Support" />} />
         <Route path="/privacy"      element={<ComingSoon pageName="Privacy Policy" />} />
         <Route path="/terms"        element={<ComingSoon pageName="Terms of Service" />} />
         <Route path="/contact"      element={<ComingSoon pageName="Contact Us" />} />
         <Route path="*" element={<ComingSoon pageName="404 – Page Not Found" />} />
-      </Routes>
+        <Route
+            path="/verify-otp"
+            element={<VerifyOtpPage onLogin={handleLogin} />}
+         />
+       </Routes>
     </BrowserRouter>
   );
 }

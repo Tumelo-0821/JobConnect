@@ -9,7 +9,7 @@ function Footer() {
         {/* Brand column */}
         <div className="footer-brand">
           <div className="footer-logo">
-            <span>🔗</span>
+            <span></span>
             JobConnect SA
           </div>
           <p>

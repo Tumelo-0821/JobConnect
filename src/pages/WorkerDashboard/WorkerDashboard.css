@@ -647,3 +647,46 @@
 .chat-negotiate-btn:hover {
   background: #1557a0;
 }
+
+/*badge====*/
+
+.dashboard-welcome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
+}
+
+.welcome-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  /*background: #dcfce7; #166534*/
+  color: #11b14f;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .dashboard-welcome {
+    align-items: flex-start;
+  }
+
+  .verified-badge {
+    padding: 5px 8px;
+    font-size: 0.7rem;
+  }
+}

@@ -23,6 +23,15 @@ class Settings(BaseSettings):
     firestore_users_collection: str = "users"
     firestore_jobs_collection: str = "jobs"
     firestore_applications_collection: str = "applications"
+    firestore_registration_otps_collection: str = "registration_otps"
+
+    # Email OTP settings
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_username: str = ""
+    smtp_password: str = ""
+    email_from: str = ""
+    smtp_use_tls: bool = True
 
     # Twilio SMS settings
     twilio_account_sid: str = ""

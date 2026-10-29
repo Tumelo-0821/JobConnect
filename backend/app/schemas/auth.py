@@ -39,7 +39,8 @@ class UserPublic(BaseModel):
     phone: str | None = None
     province: str | None = None
     role: UserRole
-    verified: bool
+    account_verified: bool = False
+    verified: bool = False
     skills: list[str] | None = None
     bio: str | None = None
     rating: float | None = None
@@ -146,3 +147,56 @@ class EmployerProfileUpdate(BaseModel):
             stripped = value.strip()
             return stripped or None
         return value
+
+class OTPRegisterRequest(BaseModel):
+    first_name: str = Field(
+        ..., min_length=1, max_length=100, alias="firstName"
+    )
+    last_name: str | None = Field(
+        default=None, max_length=100, alias="lastName"
+    )
+    email: EmailStr
+    phone: str | None = Field(default=None, max_length=20)
+    province: str | None = Field(default=None, max_length=100, alias="city")
+    password: str = Field(..., min_length=6, max_length=128)
+    role: UserRole = UserRole.WORKER
+    verification_method: str = Field(..., pattern="^(email|sms)$")
+    id_number: str | None = Field(
+        default=None, min_length=13, max_length=13, alias="idNumber"
+    )
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    @field_validator(
+        "first_name", "last_name", "phone", "province", "id_number",
+        mode="before",
+    )
+    @classmethod
+    def strip_registration_strings(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        if isinstance(value, str):
+            stripped = value.strip()
+            return stripped or None
+        return value
+
+    @field_validator("role")
+    @classmethod
+    def validate_registration_role(cls, value: UserRole) -> UserRole:
+        if value not in (UserRole.EMPLOYER, UserRole.WORKER):
+            raise ValueError("Role must be employer or worker")
+        return value
+
+    @field_validator("verification_method")
+    @classmethod
+    def validate_verification_method(cls, value: str) -> str:
+        return value.lower().strip()
+
+
+class OTPVerifyRequest(BaseModel):
+    challenge_id: str = Field(..., min_length=1, max_length=100)
+    otp: str = Field(..., min_length=6, max_length=6, pattern="^[0-9]{6}$")
+
+
+class OTPResendRequest(BaseModel):
+    challenge_id: str = Field(..., min_length=1, max_length=100)

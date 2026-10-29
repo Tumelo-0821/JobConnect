@@ -40,8 +40,8 @@ function LoginPage({ onLogin }) {
     <div className="auth-page">
       <div className="auth-left">
         <div className="auth-brand">
-          <div className="auth-brand-icon">🔗</div>
-          JobConnect SA
+           {/*<div className="auth-brand-icon"></div>*/ }
+            <h2>JobConnect SA </h2>
         </div>
 
         <div className="auth-left-content">
@@ -50,21 +50,21 @@ function LoginPage({ onLogin }) {
 
           <div className="auth-features">
             <div className="auth-feature">
-              <span className="auth-feature-icon">✅</span>
+              <span className="auth-feature-icon"></span>
               <div className="auth-feature-text">
                 <strong>Verified Workers</strong>
                 <span>Every worker has ID verification</span>
               </div>
             </div>
             <div className="auth-feature">
-              <span className="auth-feature-icon">📍</span>
+              <span className="auth-feature-icon"></span>
               <div className="auth-feature-text">
                 <strong>Near You</strong>
                 <span>Find workers in your area</span>
               </div>
             </div>
             <div className="auth-feature">
-              <span className="auth-feature-icon">💬</span>
+              <span className="auth-feature-icon"></span>
               <div className="auth-feature-text">
                 <strong>Direct Chat</strong>
                 <span>Message workers instantly</span>
@@ -142,7 +142,7 @@ function LoginPage({ onLogin }) {
             </div>
 
             <button type="submit" className="auth-submit-btn" disabled={loading}>
-              {loading ? 'Logging in...' : '🔑 Login to My Account'}
+              {loading ? 'Logging in...' : ' Login to My Account'}
             </button>
           </form>
 

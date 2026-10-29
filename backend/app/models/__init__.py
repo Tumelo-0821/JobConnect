@@ -63,6 +63,7 @@ class UserDocument:
             "id_number": (id_number or "").strip() or None,
             "profile_photo_url": (profile_photo_url or "").strip() or None,
             "role": role.value,
+            "account_verified": False,
             "is_verified": False,
             "created_at": now,
             "updated_at": now,
@@ -88,6 +89,7 @@ class UserDocument:
             "id_number": data.get("id_number"),
             "profile_photo_url": data.get("profile_photo_url"),
             "role": data.get("role"),
+            "account_verified": bool(data.get("account_verified", False)),
             "verified": bool(data.get("is_verified", False)),
             "created_at": data.get("created_at"),
             "updated_at": data.get("updated_at"),
@@ -205,8 +207,13 @@ class ApplicationDocument:
             "employer_id": employer_id,
             "job_title": job_title,
             "status": ApplicationStatus.PENDING.value,
-            "created_at": now,
-            "updated_at": now,
+            "work_status": "in_progress",
+	    "review_submitted": False,
+	    "worker_rating": None,
+	    "worker_review": None,
+	    "reviewed_at": None,
+	    "created_at": now,
+	    "updated_at": now,
         }
 
     @staticmethod
@@ -242,8 +249,11 @@ class ApplicationDocument:
             "worker_cv_available": worker_cv_available,
 
             "status": data.get("status"),
-            "created_at": data.get("created_at"),
-            "updated_at": data.get("updated_at"),
+	    "work_status": data.get("work_status", "in_progress"),
+	    "review_submitted": bool(data.get("review_submitted", False)),
+	    "worker_rating": data.get("worker_rating"),
+	    "created_at": data.get("created_at"),
+	    "updated_at": data.get("updated_at"),
         }
 
 

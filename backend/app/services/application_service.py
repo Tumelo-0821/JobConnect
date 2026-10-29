@@ -1,3 +1,4 @@
+
 from datetime import datetime, timezone
 
 from fastapi import HTTPException, status  # type: ignore[reportMissingImports]
@@ -24,12 +25,6 @@ class ApplicationService:
         self.notification_service = NotificationService(notification_repo)
 
     def apply(self, worker: dict, job_id: str) -> ApplicationResponse:
-        if not worker.get("is_verified"):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Verify your account before applying for jobs",
-            )
-
         job_result = self.job_repo.get_by_id(job_id)
         if not job_result:
             raise HTTPException(
@@ -44,13 +39,8 @@ class ApplicationService:
 
         if closing_date is not None:
             # Treat older datetimes without a timezone as UTC.
-            if (
-                closing_date.tzinfo is None
-                or closing_date.utcoffset() is None
-            ):
-                closing_date = closing_date.replace(
-                    tzinfo=timezone.utc
-                )
+            if closing_date.tzinfo is None or closing_date.utcoffset() is None:
+                closing_date = closing_date.replace(tzinfo=timezone.utc)
             else:
                 closing_date = closing_date.astimezone(timezone.utc)
 
@@ -74,6 +64,7 @@ class ApplicationService:
                 detail="This job is no longer accepting applications",
             )
 
+        # Prevent the same worker from applying to the same job twice.
         existing = self.app_repo.get_by_job_and_worker(job_id, worker["id"])
         if existing:
             raise HTTPException(
@@ -81,6 +72,7 @@ class ApplicationService:
                 detail="You have already applied for this job",
             )
 
+        # Create and save the application.
         app_data = ApplicationDocument.create(
             job_id=job_id,
             worker_id=worker["id"],
@@ -88,25 +80,33 @@ class ApplicationService:
             job_title=job_data["title"],
         )
         app_id, created = self.app_repo.create(app_data)
-        self.job_repo.increment_application_count(job_id)
-        self.notification_service.create_notification(
-    recipient_id=job_data["employer_id"],
-    notification_type=NotificationType.APPLICATION_RECEIVED,
-    title="New job application",
-    message=(
-        f"{worker.get('first_name', 'A worker')} "
-        f"has applied for your job '{job_data['title']}'."
-    ),
-    related_job_id=job_id,
-    related_application_id=app_id,
-)
 
-        return ApplicationResponse(**ApplicationDocument.to_response(app_id, created))
+        # Update the job's application count.
+        self.job_repo.increment_application_count(job_id)
+
+        # Notify the employer about the new application.
+        self.notification_service.create_notification(
+            recipient_id=job_data["employer_id"],
+            notification_type=NotificationType.APPLICATION_RECEIVED,
+            title="New job application",
+            message=(
+                f"{worker.get('first_name', 'A worker')} "
+                f"has applied for your job '{job_data['title']}'."
+            ),
+            related_job_id=job_id,
+            related_application_id=app_id,
+        )
+
+        return ApplicationResponse(
+            **ApplicationDocument.to_response(app_id, created)
+        )
 
     def list_worker_applications(self, worker_id: str) -> list[ApplicationResponse]:
         apps = self.app_repo.list_by_worker(worker_id)
         return [
-            ApplicationResponse(**ApplicationDocument.to_response(app_id, data))
+            ApplicationResponse(
+                **ApplicationDocument.to_response(app_id, data)
+            )
             for app_id, data in apps
         ]
 
@@ -115,14 +115,14 @@ class ApplicationService:
 
         if not worker_result:
             return {
-        "worker_name": None,
-        "worker_email": None,
-        "worker_phone": None,
-        "worker_skills": [],
-        "worker_bio": None,
-        "worker_province": None,
-        "worker_cv_file_name": None,
-        "worker_cv_available": False,
+                "worker_name": None,
+                "worker_email": None,
+                "worker_phone": None,
+                "worker_skills": [],
+                "worker_bio": None,
+                "worker_province": None,
+                "worker_cv_file_name": None,
+                "worker_cv_available": False,
             }
 
         _, worker_data = worker_result
@@ -143,7 +143,9 @@ class ApplicationService:
             "worker_cv_available": bool(worker_data.get("cv_storage_path")),
         }
 
-    def list_job_applications(self, employer_id: str, job_id: str) -> list[ApplicationResponse]:
+    def list_job_applications(
+        self, employer_id: str, job_id: str
+    ) -> list[ApplicationResponse]:
         job_result = self.job_repo.get_by_id(job_id)
         if not job_result:
             raise HTTPException(
@@ -152,6 +154,7 @@ class ApplicationService:
             )
 
         _, job_data = job_result
+
         if job_data.get("employer_id") != employer_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -160,11 +163,11 @@ class ApplicationService:
 
         apps = self.app_repo.list_by_job(job_id)
         results = []
+
         for app_id, data in apps:
             worker_details = self._get_worker_details(
                 data.get("worker_id", "")
             )
-
             results.append(
                 ApplicationResponse(
                     **ApplicationDocument.to_response(
@@ -174,11 +177,13 @@ class ApplicationService:
                     )
                 )
             )
+
         return results
 
-    def list_employer_applications(self, employer_id: str) -> list[ApplicationResponse]:
+    def list_employer_applications(
+        self, employer_id: str
+    ) -> list[ApplicationResponse]:
         jobs = self.job_repo.list_by_employer(employer_id)
-
         results = []
 
         for job_id, job_data in jobs:
@@ -188,17 +193,16 @@ class ApplicationService:
                 worker_details = self._get_worker_details(
                     data.get("worker_id", "")
                 )
-
                 results.append(
-                        ApplicationResponse(
-                            **ApplicationDocument.to_response(
-                                app_id,
-                                data,
-                                job_status=job_data.get("status"),
-                                **worker_details,
-                            )
+                    ApplicationResponse(
+                        **ApplicationDocument.to_response(
+                            app_id,
+                            data,
+                            job_status=job_data.get("status"),
+                            **worker_details,
                         )
                     )
+                )
 
         return results
 
@@ -209,7 +213,7 @@ class ApplicationService:
         app_id: str,
         payload: ApplicationStatusUpdate,
     ) -> ApplicationResponse:
-        # Check that the job exists
+        # Check that the job exists.
         job_result = self.job_repo.get_by_id(job_id)
         if not job_result:
             raise HTTPException(
@@ -219,14 +223,14 @@ class ApplicationService:
 
         _, job_data = job_result
 
-        # Make sure this employer owns the job
+        # Make sure this employer owns the job.
         if job_data.get("employer_id") != employer_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="You do not have permission to update this application",
             )
 
-        # Check that the application exists
+        # Check that the application exists.
         app_result = self.app_repo.get_by_id(app_id)
         if not app_result:
             raise HTTPException(
@@ -236,7 +240,7 @@ class ApplicationService:
 
         _, app_data = app_result
 
-        # Make sure the application belongs to this job
+        # Make sure this application belongs to this job.
         if app_data.get("job_id") != job_id:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -246,18 +250,15 @@ class ApplicationService:
         current_status = app_data.get("status")
         new_status = payload.status.value
 
-        if new_status == "rejected":
-            rejection_message = (
-                payload.rejection_message or ""
-            ).strip()
+        rejection_message = (payload.rejection_message or "").strip()
 
-            if not rejection_message:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Please provide a rejection message",
-                )
+        if new_status == "rejected" and not rejection_message:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Please provide a rejection message",
+            )
 
-        # Do not allow changes to an already hired or rejected application
+        # Do not allow changes to an already hired or rejected application.
         if current_status == "hired":
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
@@ -270,53 +271,49 @@ class ApplicationService:
                 detail="This application has already been rejected",
             )
 
-        # If employer is hiring this worker, make sure nobody else
-        # has already been hired for this job.
+        # Only one worker can be hired for a job.
         if new_status == "hired":
             hired_application = self.app_repo.get_hired_by_job(job_id)
-
             if hired_application:
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
                     detail="A worker has already been hired for this job",
                 )
 
-        # Update the application status
-        updated = self.app_repo.update(
-            app_id,
-            {"status": new_status, "rejection_message": rejection_message} if new_status == "rejected" else {"status": new_status},
-        )
+        update_data = {"status": new_status}
+        if new_status == "rejected":
+            update_data["rejection_message"] = rejection_message
+
+        updated = self.app_repo.update(app_id, update_data)
         worker_id = updated.get("worker_id")
 
-        if worker_id:
-            if new_status == "hired":
-                self.notification_service.create_notification(
-                    recipient_id=worker_id,
-                    notification_type=NotificationType.APPLICATION_HIRED,
-                    title="You have been hired!",
-                    message=(
-                        f"Congratulations! You have been hired for "
-                        f"'{job_data['title']}'."
-                    ),
-                    related_job_id=job_id,
-                    related_application_id=app_id,
-                )
+        if worker_id and new_status == "hired":
+            self.notification_service.create_notification(
+                recipient_id=worker_id,
+                notification_type=NotificationType.APPLICATION_HIRED,
+                title="You have been hired!",
+                message=(
+                    f"Congratulations! You have been hired for "
+                    f"'{job_data['title']}'."
+                ),
+                related_job_id=job_id,
+                related_application_id=app_id,
+            )
 
-            elif new_status == "rejected":
-                self.notification_service.create_notification(
-                    recipient_id=worker_id,
-                    notification_type=NotificationType.APPLICATION_REJECTED,
-                    title="Application update",
-                    message=(
-                        f"Your application for "
-                        f"'{job_data['title']}' was not successful.\n\n"
-                        f"Employer message:\n"
-                        f"{payload.rejection_message.strip()}"
-                    ),
-                    related_job_id=job_id,
-                    related_application_id=app_id,
-                )
-        # Get worker's name for the response
+        elif worker_id and new_status == "rejected":
+            self.notification_service.create_notification(
+                recipient_id=worker_id,
+                notification_type=NotificationType.APPLICATION_REJECTED,
+                title="Application update",
+                message=(
+                    f"Your application for '{job_data['title']}' "
+                    f"was not successful.\n\n"
+                    f"Employer message:\n{rejection_message}"
+                ),
+                related_job_id=job_id,
+                related_application_id=app_id,
+            )
+
         worker_details = self._get_worker_details(
             updated.get("worker_id", "")
         )
@@ -344,9 +341,8 @@ class ApplicationService:
         job_id: str,
         app_id: str,
     ) -> dict:
-        # Check that the job exists
+        # Check that the job exists.
         job_result = self.job_repo.get_by_id(job_id)
-
         if not job_result:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -355,16 +351,15 @@ class ApplicationService:
 
         _, job_data = job_result
 
-        # Make sure this employer owns the job
+        # Make sure this employer owns the job.
         if job_data.get("employer_id") != employer_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="You do not have permission to view this CV",
             )
 
-        # Check that the application exists
+        # Check that the application exists.
         app_result = self.app_repo.get_by_id(app_id)
-
         if not app_result:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -373,7 +368,7 @@ class ApplicationService:
 
         _, app_data = app_result
 
-        # Make sure this application belongs to this job
+        # Make sure this application belongs to this job.
         if app_data.get("job_id") != job_id:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -381,16 +376,14 @@ class ApplicationService:
             )
 
         worker_id = app_data.get("worker_id")
-
         if not worker_id:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Worker not found",
             )
 
-        # Get the worker's CV information
+        # Get the worker's CV information.
         worker_result = self.user_repo.get_by_id(worker_id)
-
         if not worker_result:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
