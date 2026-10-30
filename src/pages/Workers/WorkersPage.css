@@ -10,12 +10,19 @@
 
 .workers-hero {
   padding: 64px 24px 70px;
-  background: linear-gradient(125deg, #103b70 0%, #176bc1 65%, #2587d8 100%);
+  /*linear-gradient(125deg, #103b70 0%, #176bc1 65%, #2587d8 100%)*/
+  background: #151b54;
   color: #ffffff;
+  border-radius: 20px;
 }
 
 .workers-hero-content {
-  max-width: 1180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
   margin: 0 auto;
 }
 
@@ -31,7 +38,7 @@
 .workers-hero h1 {
   max-width: 680px;
   margin: 0 0 16px;
-  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-size: clamp(30px, 4vw, 44px);
   line-height: 1.15;
   letter-spacing: -1px;
 }

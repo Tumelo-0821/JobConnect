@@ -6,28 +6,28 @@ import './HowItWorks.css';
 const steps = [
   {
     number: '01',
-    icon: '📝',
+    icon: '',
     title: 'Create an account',
     description:
       'Register as a worker looking for opportunities or an employer looking for reliable help.',
   },
   {
     number: '02',
-    icon: '🔎',
+    
     title: 'Find the right match',
     description:
       'Workers can explore suitable jobs, while employers can post opportunities and review applicants.',
   },
   {
     number: '03',
-    icon: '🤝',
+    icon: '',
     title: 'Connect and agree',
     description:
       'Review applications, discuss the work, and agree on the responsibilities and payment before starting.',
   },
   {
     number: '04',
-    icon: '⭐',
+    icon: '',
     title: 'Complete and review',
     description:
       'Complete the agreed work and, where available, leave a review to help build trust on JobConnect SA.',
@@ -71,7 +71,7 @@ function HowItWorks({ user, onLogout }) {
 
         <section className="how-steps-section">
           <div className="how-section-heading">
-            <span className="how-eyebrow">FOUR SIMPLE STEPS</span>
+            <span className="how-eyebrow" style={{ color: '#151b54' }}>FOUR SIMPLE STEPS</span>
             <h2>How JobConnect SA works</h2>
             <p>From creating an account to completing the job.</p>
           </div>
@@ -86,13 +86,13 @@ function HowItWorks({ user, onLogout }) {
                   <span className="how-step-number">
                     {step.number}
                   </span>
-
+                   {/*
                   <span
                     className="how-step-icon"
                     aria-hidden="true"
                   >
                     {step.icon}
-                  </span>
+                  </span>*/}
                 </div>
 
                 <h3>{step.title}</h3>
@@ -104,13 +104,8 @@ function HowItWorks({ user, onLogout }) {
 
         <section className="how-audience-section">
           <article className="how-audience-card">
-            <span
-              className="how-audience-icon"
-              aria-hidden="true"
-            >
-              🧰
-            </span>
-
+            
+            
             <h2>Looking for work?</h2>
 
             <p>
@@ -122,14 +117,20 @@ function HowItWorks({ user, onLogout }) {
               Join as a worker →
             </Link>
           </article>
+          {/*<span
+              className="how-audience-icon"
+              aria-hidden="true"
+            >
+              
+            </span> */}
 
           <article className="how-audience-card how-employer-card">
-            <span
+            {/*<span
               className="how-audience-icon"
               aria-hidden="true"
             >
               🏡
-            </span>
+            </span> */}
 
             <h2>Need to hire someone?</h2>
 

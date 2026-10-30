@@ -342,7 +342,7 @@ function EmployerDashboard({ user, onLogout, authLoading }) {
               <div className="emp-welcome-avatar">🏢</div>
 
               <div className="emp-welcome-text">
-                <h2>Welcome, {user.name.split(' ')[0]}! 👋</h2>
+                <h2>Welcome, {user.name.split(' ')[0]}!</h2>
                 <p>Manage your jobs and find trusted workers</p>
               </div>
             </div>
@@ -525,7 +525,11 @@ function EmployerDashboard({ user, onLogout, authLoading }) {
                 ) : (
                   visibleApplications.map(application => (
                     <div key={application.id} className="worker-result-card">
-                      <div className="worker-result-avatar">👷</div>
+                     <div className="worker-result-avatar">
+                          {application.worker_name
+                            ? application.worker_name.trim().charAt(0).toUpperCase()
+                            : 'W'}
+                        </div>
 
                       <div className="worker-result-info">
                         <div className="worker-result-name">
@@ -711,7 +715,11 @@ function EmployerDashboard({ user, onLogout, authLoading }) {
                 ) : (
                   workers.map(worker => (
                     <div key={worker.id} className="worker-result-card">
-                      <div className="worker-result-avatar">👷</div>
+                      <div className="worker-result-avatar">
+                            {worker.name
+                              ? worker.name.trim().charAt(0).toUpperCase()
+                              : 'W'}
+                          </div>
 
                       <div className="worker-result-info">
                         <div className="worker-result-name">
@@ -808,7 +816,11 @@ function EmployerDashboard({ user, onLogout, authLoading }) {
                       className="shortlist-item"
                       style={{ flexWrap: 'wrap', alignItems: 'flex-start' }}
                     >
-                      <div className="shortlist-avatar">👤</div>
+                      <div className="shortlist-avatar"><div className="worker-result-avatar">
+                              {application.worker_name
+                                ? application.worker_name.trim().charAt(0).toUpperCase()
+                                : 'W'}
+                            </div></div>
 
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div className="shortlist-name">

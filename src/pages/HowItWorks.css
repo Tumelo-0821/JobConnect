@@ -6,23 +6,27 @@
 }
 
 .how-hero {
-  padding: 90px 24px 80px;
+  padding: 90px 2px 60px;
   text-align: center;
-  background: linear-gradient(135deg, #eaf4ff, #f7f9fc 65%, #e9f9f0);
+  background: #151b54;
+  border-radius: 0 0 20px 20px;
 }
 
 .how-eyebrow {
   display: inline-block;
-  color: #16804a;
+  color: white;
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 2px;
 }
+.how-eyebrow h2{
+  color: #151b54
+}
 
 .how-hero h1 {
   max-width: 850px;
-  margin: 20px auto;
-  color: #12345b;
+  margin: 10px auto;
+  color: white;
   font-size: clamp(2.2rem, 5vw, 4rem);
   line-height: 1.15;
 }
@@ -30,7 +34,7 @@
 .how-hero > p {
   max-width: 680px;
   margin: 0 auto;
-  color: #586579;
+  color: #9da8b8;
   font-size: 1.05rem;
   line-height: 1.8;
 }
@@ -83,16 +87,18 @@
   text-align: center;
 }
 
-.how-section-heading h2,
+.how-section-heading h2{
+  color:#123277;
+}
 .how-bottom-cta h2 {
   margin: 12px 0;
-  color: #12345b;
+  color: white;
   font-size: clamp(1.8rem, 4vw, 2.5rem);
 }
 
 .how-section-heading p,
 .how-bottom-cta p {
-  color: #657185;
+  color: #8e99ac;
   line-height: 1.7;
 }
 
@@ -118,7 +124,7 @@
 }
 
 .how-step-number {
-  color: #16804a;
+  color: #123277;
   font-size: 0.9rem;
   font-weight: 800;
 }
@@ -167,7 +173,7 @@
 
 .how-employer-card {
   border-color: #d7eee0;
-  background: #f5fcf7;
+  background: #c6d2db;
 }
 
 .how-audience-card h2 {
@@ -191,7 +197,8 @@
 .how-bottom-cta {
   padding: 65px 24px;
   text-align: center;
-  background: #eaf4ff;
+  background: #151b54;
+  border-radius: 20px 20px 0 0;
 }
 
 .how-bottom-cta .how-button {

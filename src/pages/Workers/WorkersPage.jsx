@@ -48,7 +48,7 @@ function WorkerCard({ worker }) {
         <div className="worker-identity">
           <h2>{getWorkerName(worker)}</h2>
           <p className="worker-location">
-            <span aria-hidden="true">⌖</span> {getWorkerLocation(worker)}
+            <span aria-hidden="true"></span> {getWorkerLocation(worker)}
           </p>
         </div>
 
@@ -392,7 +392,7 @@ export default function WorkersPage({ user, onLogout, authLoading }) {
 
           <p className="workers-data-note">
             Ratings and verification labels are based on the information
-            returned by JobConnect's API.
+            returned by JobConnect's .
           </p>
         </section>
       </main>
