@@ -35,7 +35,7 @@ class NotificationService:
             related_job_id=related_job_id,
             related_application_id=related_application_id,
         )
-        
+
      # Send SMS in addition to the in-app notification
         self.sms_service.send_notification_sms(
             recipient_id=recipient_id,

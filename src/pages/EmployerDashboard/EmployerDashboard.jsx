@@ -433,15 +433,10 @@ function EmployerDashboard({ user, onLogout, authLoading }) {
               <div className="section-card">
                 <div className="section-card-header">
                   <h3>📋 My Posted Jobs</h3>
-
-                  <button
-                    className="see-all-btn"
-                    onClick={() => navigate('/post-job')}
-                  >
+                  <button className="see-all-btn" onClick={() => navigate('/post-job')}>
                     + New Job
                   </button>
                 </div>
-
                 {loading ? (
                   <p style={{ padding: '16px', color: '#6b7280' }}>
                     Loading jobs...

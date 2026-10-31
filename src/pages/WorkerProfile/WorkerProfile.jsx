@@ -319,7 +319,7 @@ function WorkerProfile({ user, onLogout, authLoading }) {
               />
             </div>
           </div>
-           
+
                      <div className="form-section">
             <h2>Curriculum Vitae (CV)</h2>
 

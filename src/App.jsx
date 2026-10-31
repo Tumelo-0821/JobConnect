@@ -1,38 +1,76 @@
-import HowItWorks from './pages/HowItWorks';
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import './styles/global.css';
+
+import LandingPage from './pages/LandingPage/LandingPage';
+import LoginPage from './pages/Auth/LoginPage';
+import RegisterPage from './pages/Auth/RegisterPage';
+import VerificationPage from './pages/Verification/VerificationPage';
+import VerifyOtpPage from './pages/Auth/VerifyOtpPage';
+
+import WorkerDashboard from './pages/WorkerDashboard/WorkerDashboard';
+import WorkerProfile from './pages/WorkerProfile/WorkerProfile';
+import EmployerDashboard from './pages/EmployerDashboard/EmployerDashboard';
+
+import PostJobPage from './pages/JobPost/PostJobPage';
 import JobsPage from './pages/Jobs/JobsPage';
-import WorkersPage        from './pages/Workers/WorkersPage';
-import LandingPage        from './pages/LandingPage/LandingPage';
-import LoginPage          from './pages/Auth/LoginPage';
-import RegisterPage       from './pages/Auth/RegisterPage';
-import VerifyOtpPage      from './pages/Auth/VerifyOtpPage';
-import WorkerDashboard    from './pages/WorkerDashboard/WorkerDashboard';
-import WorkerProfile      from './pages/WorkerProfile/WorkerProfile';
-import EmployerDashboard  from './pages/EmployerDashboard/EmployerDashboard';
-import PostJobPage        from './pages/JobPost/PostJobPage';
-import ChatPage           from './pages/Chat/ChatPage';
+import WorkersPage from './pages/Workers/WorkersPage';
+
+import ChatPage from './pages/Chat/ChatPage';
+import JobConnectChat from './components/JobConnectChat/JobConnectChat';
+import HowItWorks from './pages/HowItWorks';
+
 import { getStoredUser, clearAuth, api } from './services/api';
+
+// ==========================================
+// TEMPORARY PAGE COMPONENT
+// ==========================================
 
 function ComingSoon({ pageName }) {
   return (
-    <div style={{
-      minHeight: '100vh', display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center',
-      fontFamily: 'Poppins, sans-serif', background: '#f7f9fc',
-      padding: '20px', textAlign: 'center'
-    }}>
-      <div style={{ fontSize: '4rem', marginBottom: '16px' }}>🚧</div>
-      <h2 style={{ fontSize: '1.8rem', color: '#1a6fc4', marginBottom: '8px' }}>{pageName}</h2>
-      <p style={{ color: '#6b7280', marginBottom: '24px' }}>This page is coming soon!</p>
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'Poppins, sans-serif',
+        background: '#f7f9fc',
+        padding: '20px',
+        textAlign: 'center',
+      }}
+    >
+      <div style={{ fontSize: '4rem', marginBottom: '16px' }}>
+        🚧
+      </div>
+
+      <h2
+        style={{
+          fontSize: '1.8rem',
+          color: '#1a6fc4',
+          marginBottom: '8px',
+        }}
+      >
+        {pageName}
+      </h2>
+
+      <p style={{ color: '#6b7280', marginBottom: '24px' }}>
+        This page is coming soon!
+      </p>
+
       <button
         onClick={() => window.history.back()}
         style={{
-          background: '#1a6fc4', color: 'white', border: 'none',
-          padding: '12px 28px', borderRadius: '8px',
-          fontSize: '1rem', fontWeight: '700', cursor: 'pointer'
+          background: '#1a6fc4',
+          color: 'white',
+          border: 'none',
+          padding: '12px 28px',
+          borderRadius: '8px',
+          fontSize: '1rem',
+          fontWeight: '700',
+          cursor: 'pointer',
         }}
       >
         ← Go Back
@@ -41,23 +79,74 @@ function ComingSoon({ pageName }) {
   );
 }
 
+// ==========================================
+// HOME ROUTE
+// ==========================================
+
+function HomeRoute({ user, onLogout, authLoading }) {
+  if (authLoading) {
+    return null;
+  }
+
+  if (!user) {
+    return <LandingPage />;
+  }
+
+  if (user.role === 'worker') {
+    return (
+      <WorkerDashboard
+        user={user}
+        onLogout={onLogout}
+        authLoading={authLoading}
+      />
+    );
+  }
+
+  if (user.role === 'employer') {
+    return (
+      <EmployerDashboard
+        user={user}
+        onLogout={onLogout}
+        authLoading={authLoading}
+      />
+    );
+  }
+
+  return <LandingPage user={user} onLogout={onLogout} />;
+}
+
+// ==========================================
+// MAIN APPLICATION
+// ==========================================
+
 function App() {
   const [user, setUser] = useState(getStoredUser);
   const [authLoading, setAuthLoading] = useState(!!getStoredUser());
+  const [chatEmployerId, setChatEmployerId] = useState(null);
+  const [chatJob, setChatJob] = useState(null);
+  // ==========================================
+  // AUTHENTICATION
+  // ==========================================
 
   useEffect(() => {
-    if (!getStoredUser()) {
+    const storedUser = getStoredUser();
+
+    if (!storedUser) {
       setAuthLoading(false);
       return;
     }
 
     api.getMe()
-      .then((freshUser) => setUser(freshUser))
+      .then((freshUser) => {
+        setUser(freshUser);
+      })
       .catch(() => {
         clearAuth();
         setUser(null);
       })
-      .finally(() => setAuthLoading(false));
+      .finally(() => {
+        setAuthLoading(false);
+      });
   }, []);
 
   function handleLogin(userData) {
@@ -69,36 +158,171 @@ function App() {
     setUser(null);
   }
 
-  const sharedProps = { user, onLogout: handleLogout, authLoading };
+  function handleOpenEmployerChat(employerId, jobId, jobTitle) {
+    if (!employerId) {
+      console.error('Cannot open chat: employer ID is missing.');
+      return;
+    }
+
+    setChatJob({
+      id: jobId,
+      title: jobTitle,
+    });
+
+    setChatEmployerId(employerId);
+  }
+
+  const sharedProps = {
+    user,
+    onLogout: handleLogout,
+    authLoading,
+    onOpenEmployerChat: handleOpenEmployerChat,
+  };
+
+  // ==========================================
+  // APPLICATION ROUTES
+  // ==========================================
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/"            element={<LandingPage       {...sharedProps} />} />
-        <Route path="/login"       element={<LoginPage         onLogin={handleLogin} />} />
-        <Route path="/register"    element={<RegisterPage      onLogin={handleLogin} />} />
-        
-        <Route path="/worker-dashboard"   element={<WorkerDashboard   {...sharedProps} />} />
-        <Route path="/worker-profile"     element={<WorkerProfile     {...sharedProps} />} />
-        <Route path="/employer-dashboard" element={<EmployerDashboard {...sharedProps} />} />
-        <Route path="/post-job" element={<PostJobPage {...sharedProps} />} />
-        <Route path="/jobs" element={<JobsPage {...sharedProps} />} />
-        <Route path="/workers"  element={<WorkersPage {...sharedProps} />}/>
-        <Route path="/worker/:id"  element={<ComingSoon pageName="Worker Profile" />} />
-        <Route path="/chat"    element={<ChatPage {...sharedProps} />} />
-        <Route path="/chat/:id" element={<ChatPage {...sharedProps} />} />
-        <Route path="/how-it-works" element={<HowItWorks {...sharedProps} />}/>
-        <Route path="/about"        element={<ComingSoon pageName="About Us" />} />
-        <Route path="/support"      element={<ComingSoon pageName="Support" />} />
-        <Route path="/privacy"      element={<ComingSoon pageName="Privacy Policy" />} />
-        <Route path="/terms"        element={<ComingSoon pageName="Terms of Service" />} />
-        <Route path="/contact"      element={<ComingSoon pageName="Contact Us" />} />
-        <Route path="*" element={<ComingSoon pageName="404 – Page Not Found" />} />
+
+        {/* PUBLIC PAGES */}
+
         <Route
-            path="/verify-otp"
-            element={<VerifyOtpPage onLogin={handleLogin} />}
-         />
-       </Routes>
+          path="/"
+          element={<LandingPage {...sharedProps} />}
+        />
+
+        <Route
+          path="/login"
+          element={<LoginPage onLogin={handleLogin} />}
+        />
+
+        <Route
+          path="/register"
+          element={<RegisterPage onLogin={handleLogin} />}
+        />
+
+        {/* OTP VERIFICATION */}
+
+        <Route
+          path="/verify-otp"
+          element={<VerifyOtpPage onLogin={handleLogin} />}
+        />
+
+        {/* WORKER */}
+
+        <Route
+          path="/worker-dashboard"
+          element={<WorkerDashboard {...sharedProps} />}
+        />
+
+        <Route
+          path="/worker-profile"
+          element={<WorkerProfile {...sharedProps} />}
+        />
+
+        <Route
+          path="/verification"
+          element={
+            <VerificationPage
+              {...sharedProps}
+              onLogin={handleLogin}
+            />
+          }
+        />
+
+        {/* EMPLOYER */}
+
+        <Route
+          path="/employer-dashboard"
+          element={<EmployerDashboard {...sharedProps} />}
+        />
+
+        <Route
+          path="/post-job"
+          element={<PostJobPage {...sharedProps} />}
+        />
+
+        {/* BROWSE JOBS */}
+
+        <Route
+          path="/jobs"
+          element={<JobsPage {...sharedProps} />}
+        />
+
+        {/* BROWSE WORKERS */}
+
+        <Route
+          path="/workers"
+          element={<WorkersPage {...sharedProps} />}
+        />
+
+        <Route
+          path="/worker/:id"
+          element={<ComingSoon pageName="Worker Profile" />}
+        />
+
+        {/* CHAT */}
+
+        <Route
+          path="/chat"
+          element={<ChatPage {...sharedProps} />}
+        />
+
+        <Route
+          path="/chat/:id"
+          element={<ChatPage {...sharedProps} />}
+        />
+
+        {/* INFORMATION PAGES */}
+
+        <Route
+          path="/how-it-works"
+          element={<HowItWorks {...sharedProps} />}
+        />
+
+        <Route
+          path="/about"
+          element={<ComingSoon pageName="About Us" />}
+        />
+
+        <Route
+          path="/support"
+          element={<ComingSoon pageName="Support" />}
+        />
+
+        <Route
+          path="/privacy"
+          element={<ComingSoon pageName="Privacy Policy" />}
+        />
+
+        <Route
+          path="/terms"
+          element={<ComingSoon pageName="Terms of Service" />}
+        />
+
+        <Route
+          path="/contact"
+          element={<ComingSoon pageName="Contact Us" />}
+        />
+
+        {/* 404 PAGE */}
+
+        <Route
+          path="*"
+          element={<ComingSoon pageName="404 – Page Not Found" />}
+        />
+
+      </Routes>
+    {user && (
+      <JobConnectChat
+        user={user}
+        employerId={chatEmployerId}
+        selectedJob={chatJob}
+      />
+    )}
     </BrowserRouter>
   );
 }

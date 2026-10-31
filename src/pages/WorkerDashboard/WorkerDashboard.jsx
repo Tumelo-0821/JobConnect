@@ -12,11 +12,10 @@ import {
   FaCheckCircle,
   FaMoneyBillWave,
   FaStar,
-  FaHandPaper,
   FaCalendarAlt,
 } from 'react-icons/fa';
 
-function WorkerDashboard({ user, onLogout, authLoading }) {
+function WorkerDashboard({ user, onLogout, authLoading, onOpenEmployerChat }) {
   const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState([]);
@@ -114,6 +113,17 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
   }
 
   async function handleApply(jobId) {
+    if (user?.verified !== true) {
+      setError('Verify your ID before applying for jobs.');
+      return;
+    }
+
+    const job = jobs.find((item) => item.id === jobId);
+    if (job && isJobUnavailable(job)) {
+      setError('Applications for this job are closed.');
+      return;
+    }
+
     setError('');
     setApplyingId(jobId);
 
@@ -214,6 +224,12 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
     const isApplying = applyingId === job.id;
     const unavailable = isJobUnavailable(job);
 
+    console.log('Job chat details:', {
+      jobId: job.id,
+      employerId: job.employer_id,
+      employerName: job.employer_name
+    });
+
     return (
       <div key={job.id} className="job-card">
         <div className="job-card-top">
@@ -254,10 +270,12 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
         </div>
 
         <div className="job-card-actions">
+
           <button
             className="apply-btn"
             onClick={() => handleApply(job.id)}
-            disabled={unavailable || alreadyApplied || isApplying}
+            disabled={unavailable || alreadyApplied || isApplying || user?.verified !== true}
+            title={user?.verified !== true ? 'Verify your ID first to apply' : ''}
           >
             {unavailable
               ? 'Applications Closed'
@@ -265,17 +283,23 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
               ? 'Applied'
               : isApplying
               ? 'Applying...'
-              : (
-                <>
-                   Apply Now
-                </>
-              )}
+              : user?.verified !== true
+              ? '🔒 Verify ID to Apply'
+              : 'Apply Now'}
           </button>
 
           <button
             type="button"
             className="chat-negotiate-btn"
-            onClick={() => {}}
+            onClick={() =>
+              onOpenEmployerChat(
+                job.employer_id,
+                job.id,
+                job.title
+              )
+            }
+            disabled={!job.employer_id}
+            title="Chat with employer"
           >
             💬 Chat &amp; Negotiate
           </button>
@@ -492,7 +516,7 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
 
             <div className="section-card" style={{ marginTop: '20px' }}>
               <div className="section-card-header">
-                <h3> My Applications</h3>
+                <h3><FaClipboardList /> My Applications</h3>
               </div>
 
               {applications.length === 0 ? (
@@ -500,19 +524,36 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
                   You haven't applied to any jobs yet.
                 </p>
               ) : (
-                applications.map((application) => (
-                  <div key={application.id} className="applied-job-row">
+                applications.map((app) => (
+                  <div key={app.id} className="applied-job-row">
                     <div className="applied-job-info">
-                      <div className="job-title">
-                        {application.job_title}
-                      </div>
+                      <div className="job-title">{app.job_title}</div>
                     </div>
-
-                    <span className={`status-badge ${application.status}`}>
-                      {application.status === 'pending' && '⏳ Pending'}
-                      {application.status === 'approved' && '✅ Approved'}
-                      {application.status === 'rejected' && '❌ Not Selected'}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span className={`status-badge ${app.status}`}>
+                        {app.status === 'pending' && '⏳ Pending'}
+                        {app.status === 'approved' && '✅ Approved'}
+                        {app.status === 'hired' && '✅ Hired'}
+                        {app.status === 'rejected' && '❌ Not Selected'}
+                      </span>
+                      {app.employer_id && (
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/chat/${app.employer_id}`)}
+                          style={{
+                            border: 'none',
+                            borderRadius: '20px',
+                            padding: '8px 16px',
+                            background: '#1a6fc4',
+                            color: 'white',
+                            fontWeight: '600',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          💬 Message Employer
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))
               )}
