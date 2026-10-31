@@ -412,9 +412,37 @@
   flex-shrink: 0;
 }
 
-.job-badge.new     { background: #e8f1fb; color: #1a6fc4; }
-.job-badge.urgent  { background: #fff3ec; color: #ff6b35; }
-.job-badge.applied { background: #e8f8f0; color: #27ae60; }
+
+.job-badge.new {
+  background: #e8f1fb;
+  color: #1a6fc4;
+}
+
+.job-badge.normal {
+  background: #e8f8f0;
+  color: #218838;
+}
+
+.job-badge.soon {
+  background: #fff8e1;
+  color: #9a6700;
+}
+
+.job-badge.urgent {
+  background: #fff3ec;
+  color: #d9480f;
+}
+
+.job-badge.closed {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.job-closing-date {
+  color: #155da5;
+  font-weight: 600;
+}
+
 
 .job-meta {
   display: flex;
@@ -434,10 +462,13 @@
   white-space: nowrap;
 }
 
+
 .job-card-actions {
   display: flex;
   gap: 8px;
+  margin-top: 18px;
 }
+
 
 .apply-btn {
   background: #1a6fc4;
@@ -599,4 +630,63 @@
   font-size: 0.82rem;
   line-height: 1.6;
   white-space: pre-wrap;
+}
+/* Chat & Negotiate placeholder button */
+.chat-negotiate-btn {
+  background: #1a6fc4;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.chat-negotiate-btn:hover {
+  background: #1557a0;
+}
+
+/*badge====*/
+
+.dashboard-welcome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
+}
+
+.welcome-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  /*background: #dcfce7; #166534*/
+  color: #11b14f;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .dashboard-welcome {
+    align-items: flex-start;
+  }
+
+  .verified-badge {
+    padding: 5px 8px;
+    font-size: 0.7rem;
+  }
 }

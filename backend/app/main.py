@@ -14,7 +14,9 @@ from app.routers import (
     jobs,
     notifications,
     worker_jobs,
+    public_jobs,
     workers,
+    work_reviews,
 )
 
 
@@ -47,12 +49,14 @@ API_PREFIX = "/api/v1"
 app.include_router(auth.router, prefix=API_PREFIX)
 app.include_router(employers.router, prefix=API_PREFIX)
 app.include_router(jobs.router, prefix=API_PREFIX)
+app.include_router(public_jobs.router, prefix=API_PREFIX)
 app.include_router(workers.router, prefix=API_PREFIX)
 app.include_router(worker_jobs.router, prefix=API_PREFIX)
 app.include_router(applications.router, prefix=API_PREFIX)
 app.include_router(employer_stats.router, prefix=API_PREFIX)
 app.include_router(notifications.router, prefix=API_PREFIX)
 app.include_router(chat.router, prefix=API_PREFIX)
+app.include_router(work_reviews.router, prefix=API_PREFIX)
 
 @app.get("/health", tags=["Health"])
 def health_check() -> dict[str, str]:

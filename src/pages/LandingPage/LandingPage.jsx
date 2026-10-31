@@ -10,16 +10,28 @@ function LandingPage({ user, onLogout }) {
 
   // Job categories available on the platform
   const categories = [
-    { name: 'Construction', count: '1,200+ workers', icon: '🏗️' },
-    { name: 'Cleaning', count: '850+ workers', icon: '🧹' },
-    { name: 'Gardening', count: '620+ workers', icon: '🌿' },
-    { name: 'Electrical', count: '430+ workers', icon: '⚡' },
-    { name: 'Plumbing', count: '380+ workers', icon: '🔧' },
-    { name: 'Painting', count: '510+ workers', icon: '🎨' },
-    { name: 'Driving', count: '740+ workers', icon: '🚗' },
-    { name: 'Childcare', count: '290+ workers', icon: '👶' },
-  ];
+  { name: 'Construction', count: '1,200+ workers', image: '/images/download.jpg' },
+  { name: 'Cleaning', count: '850+ workers', image: '/images/cleaning.jpg' },
+  { name: 'Gardening', count: '620+ workers', image: '/images/gardn.jpg' },
+  { name: 'Electrical', count: '430+ workers', image: '/images/electrical.jpg' },
+  { name: 'Plumbing', count: '380+ workers', image: '/images/plumbing.jpg' },
+  { name: 'Painting', count: '510+ workers', image: '/images/painting.jpg' },
+  { name: 'Driving', count: '740+ workers', image: '/images/driving.jpg' },
+  { name: 'Childcare', count: '290+ workers', image: '/images/child.jpg' },
+];
 
+ {/*
+  const categories = [
+    { name: 'Construction', count: '1,200+ workers'},
+    { name: 'Cleaning', count: '850+ workers' },
+    { name: 'Gardening', count: '620+ workers' },
+    { name: 'Electrical', count: '430+ workers'},
+    { name: 'Plumbing', count: '380+ workers' },
+    { name: 'Painting', count: '510+ workers' },
+    { name: 'Driving', count: '740+ workers' },
+    { name: 'Childcare', count: '290+ workers' },
+  ];
+*/}
   const testimonials = [
     {
       name: 'Sipho Dlamini',
@@ -179,7 +191,39 @@ function LandingPage({ user, onLogout }) {
       </section>
 
       {/* ===== JOB CATEGORIES ===== */}
-      <section className="categories">
+      {/* ===== JOB CATEGORIES ===== */}
+<section className="categories">
+  <div className="container">
+    <div className="section-header">
+      <div className="section-tag">Browse by Category</div>
+      <h2>Find workers for any job</h2>
+      <p>Thousands of skilled workers ready to help you today</p>
+    </div>
+
+    <div className="categories-grid">
+      {categories.map((cat) => (
+        <div
+          key={cat.name}
+          className="category-card"
+          onClick={() => navigate('/workers')}
+          style={{
+            backgroundImage: `linear-gradient(
+              to top,
+              rgba(0, 0, 0, 0.8),
+              rgba(0, 0, 0, 0.1)
+            ), url("${cat.image}")`,
+          }}
+        >
+          <div className="category-card-content">
+            <h3>{cat.name}</h3>
+            <p>{cat.count}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+     {/* <section className="categories">
         <div className="container">
           <div className="section-header">
             <div className="section-tag">Browse by Category</div>
@@ -201,7 +245,7 @@ function LandingPage({ user, onLogout }) {
             ))}
           </div>
         </div>
-      </section>
+      </section>*/}
 
       {/* ===== TESTIMONIALS ===== */}
       <section className="testimonials">

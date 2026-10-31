@@ -1,19 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import './styles/global.css';
 
-import LandingPage       from './pages/LandingPage/LandingPage';
-import LoginPage         from './pages/Auth/LoginPage';
-import RegisterPage      from './pages/Auth/RegisterPage';
-import VerificationPage  from './pages/Verification/VerificationPage';
-import WorkerDashboard   from './pages/WorkerDashboard/WorkerDashboard';
-import WorkerProfile     from './pages/WorkerProfile/WorkerProfile';
+import LandingPage from './pages/LandingPage/LandingPage';
+import LoginPage from './pages/Auth/LoginPage';
+import RegisterPage from './pages/Auth/RegisterPage';
+import VerificationPage from './pages/Verification/VerificationPage';
+import VerifyOtpPage from './pages/Auth/VerifyOtpPage';
+
+import WorkerDashboard from './pages/WorkerDashboard/WorkerDashboard';
+import WorkerProfile from './pages/WorkerProfile/WorkerProfile';
 import EmployerDashboard from './pages/EmployerDashboard/EmployerDashboard';
-import PostJobPage       from './pages/JobPost/PostJobPage';
-import ChatPage          from './pages/Chat/ChatPage';
+
+import PostJobPage from './pages/JobPost/PostJobPage';
+import JobsPage from './pages/Jobs/JobsPage';
+import WorkersPage from './pages/Workers/WorkersPage';
+
+import ChatPage from './pages/Chat/ChatPage';
+import HowItWorks from './pages/HowItWorks';
 
 import { getStoredUser, clearAuth, api } from './services/api';
+
+// ==========================================
+// TEMPORARY PAGE COMPONENT
+// ==========================================
 
 function ComingSoon({ pageName }) {
   return (
@@ -30,7 +41,9 @@ function ComingSoon({ pageName }) {
         textAlign: 'center',
       }}
     >
-      <div style={{ fontSize: '4rem', marginBottom: '16px' }}>🚧</div>
+      <div style={{ fontSize: '4rem', marginBottom: '16px' }}>
+        🚧
+      </div>
 
       <h2
         style={{
@@ -65,6 +78,10 @@ function ComingSoon({ pageName }) {
   );
 }
 
+// ==========================================
+// HOME ROUTE
+// ==========================================
+
 function HomeRoute({ user, onLogout, authLoading }) {
   if (authLoading) {
     return null;
@@ -97,9 +114,17 @@ function HomeRoute({ user, onLogout, authLoading }) {
   return <LandingPage user={user} onLogout={onLogout} />;
 }
 
+// ==========================================
+// MAIN APPLICATION
+// ==========================================
+
 function App() {
   const [user, setUser] = useState(getStoredUser);
   const [authLoading, setAuthLoading] = useState(!!getStoredUser());
+
+  // ==========================================
+  // AUTHENTICATION
+  // ==========================================
 
   useEffect(() => {
     const storedUser = getStoredUser();
@@ -137,13 +162,15 @@ function App() {
     authLoading,
   };
 
+  // ==========================================
+  // APPLICATION ROUTES
+  // ==========================================
+
   return (
     <BrowserRouter>
       <Routes>
 
-        {/* =========================
-            PUBLIC PAGES
-        ========================== */}
+        {/* PUBLIC PAGES */}
 
         <Route
           path="/"
@@ -160,9 +187,14 @@ function App() {
           element={<RegisterPage onLogin={handleLogin} />}
         />
 
-        {/* =========================
-            WORKER
-        ========================== */}
+        {/* OTP VERIFICATION */}
+
+        <Route
+          path="/verify-otp"
+          element={<VerifyOtpPage onLogin={handleLogin} />}
+        />
+
+        {/* WORKER */}
 
         <Route
           path="/worker-dashboard"
@@ -184,9 +216,7 @@ function App() {
           }
         />
 
-        {/* =========================
-            EMPLOYER
-        ========================== */}
+        {/* EMPLOYER */}
 
         <Route
           path="/employer-dashboard"
@@ -198,9 +228,26 @@ function App() {
           element={<PostJobPage {...sharedProps} />}
         />
 
-        {/* =========================
-            CHAT
-        ========================== */}
+        {/* BROWSE JOBS */}
+
+        <Route
+          path="/jobs"
+          element={<JobsPage {...sharedProps} />}
+        />
+
+        {/* BROWSE WORKERS */}
+
+        <Route
+          path="/workers"
+          element={<WorkersPage {...sharedProps} />}
+        />
+
+        <Route
+          path="/worker/:id"
+          element={<ComingSoon pageName="Worker Profile" />}
+        />
+
+        {/* CHAT */}
 
         <Route
           path="/chat"
@@ -212,28 +259,11 @@ function App() {
           element={<ChatPage {...sharedProps} />}
         />
 
-        {/* =========================
-            TEMPORARY PAGES
-        ========================== */}
-
-        <Route
-          path="/jobs"
-          element={<ComingSoon pageName="Browse Jobs" />}
-        />
-
-        <Route
-          path="/workers"
-          element={<ComingSoon pageName="Browse Workers" />}
-        />
-
-        <Route
-          path="/worker/:id"
-          element={<ComingSoon pageName="Worker Profile" />}
-        />
+        {/* INFORMATION PAGES */}
 
         <Route
           path="/how-it-works"
-          element={<ComingSoon pageName="How It Works" />}
+          element={<HowItWorks {...sharedProps} />}
         />
 
         <Route
@@ -261,9 +291,7 @@ function App() {
           element={<ComingSoon pageName="Contact Us" />}
         />
 
-        {/* =========================
-            404
-        ========================== */}
+        {/* 404 PAGE */}
 
         <Route
           path="*"

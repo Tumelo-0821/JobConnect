@@ -27,6 +27,15 @@ def get_job_service(
         user_repo,
         notification_repo,
     )
+@router.get(
+    "/public",
+    response_model=list[JobResponse],
+    summary="List all currently open jobs",
+)
+def list_public_jobs(
+    job_service: JobService = Depends(get_job_service),
+) -> list[JobResponse]:
+    return job_service.list_open_jobs()
 
 
 @router.post(

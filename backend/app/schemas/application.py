@@ -32,6 +32,9 @@ class ApplicationResponse(BaseModel):
     status: ApplicationStatus
     created_at: datetime | None = None
     updated_at: datetime | None = None
+    work_status: str = "in_progress"
+    review_submitted: bool = False
+    worker_rating: float | None = None
 
 
 class ApplicationStatusUpdate(BaseModel):
