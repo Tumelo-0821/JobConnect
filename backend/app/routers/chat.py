@@ -4,6 +4,7 @@ from app.dependencies import (
     get_chat_repository,
     get_current_user,
     get_user_repository,
+    get_job_repository,
 )
 from app.repositories.memory import ChatRepository, UserRepository
 from app.schemas.chat import (
@@ -23,10 +24,12 @@ router = APIRouter(
 def get_chat_service(
     chat_repo: ChatRepository = Depends(get_chat_repository),
     user_repo: UserRepository = Depends(get_user_repository),
+    job_repo = Depends(get_job_repository),
 ) -> ChatService:
     return ChatService(
         chat_repo=chat_repo,
         user_repo=user_repo,
+        job_repo=job_repo,
     )
 
 
@@ -166,3 +169,19 @@ def mark_conversation_as_read(
     )
 
     return None
+@router.post(
+    "/conversations/{conversation_id}/jobs/{job_id}",
+    response_model=MessageResponse,
+    status_code=status.HTTP_200_OK,
+)
+def add_job_label(
+    conversation_id: str,
+    job_id: str,
+    current_user=Depends(get_current_user),
+    chat_service: ChatService = Depends(get_chat_service),
+):
+    return chat_service.add_job_label(
+        current_user=current_user,
+        conversation_id=conversation_id,
+        job_id=job_id,
+    )

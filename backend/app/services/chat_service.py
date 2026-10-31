@@ -13,10 +13,69 @@ class ChatService:
         self,
         chat_repo: ChatRepository,
         user_repo: UserRepository,
+        job_repo=None,
     ) -> None:
         self.chat_repo = chat_repo
         self.user_repo = user_repo
+        self.job_repo = job_repo
 
+    def add_job_label(
+        self,
+        current_user: dict,
+        conversation_id: str,
+        job_id: str,
+    ) -> MessageResponse:
+
+        conversation_result = self.chat_repo.get_conversation(
+            conversation_id
+        )
+
+        if not conversation_result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Conversation not found",
+            )
+
+        _, conversation = conversation_result
+
+        current_user_id = str(current_user["id"])
+
+        participants = {
+            str(conversation["employer_id"]),
+            str(conversation["worker_id"]),
+        }
+
+        if current_user_id not in participants:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have access to this conversation",
+            )
+
+        job_result = self.job_repo.get_by_id(job_id)
+
+        if not job_result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Job not found",
+            )
+
+        _, job = job_result
+
+        if str(job.get("employer_id")) != str(conversation["employer_id"]):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="This job does not belong to the employer",
+            )
+
+        label_id, label_data = self.chat_repo.create_job_label(
+            conversation_id=conversation_id,
+            job_id=job_id,
+            job_title=job.get("title") or "Job",
+        )
+
+        return MessageResponse(
+            **MessageDocument.to_response(label_id, label_data)
+        )
     # ---------------------------------------------------------
     # CONVERSATION
     # ---------------------------------------------------------
@@ -344,15 +403,53 @@ class ChatService:
             )
         )
 
-        return [
-            ConversationResponse(
-                **ConversationDocument.to_response(
-                    conversation_id,
-                    data,
-                )
+        results = []
+
+        for conversation_id, data in conversations:
+
+            employer_id = data.get("employer_id")
+            worker_id = data.get("worker_id")
+
+            employer_result = (
+                self.user_repo.get_by_id(employer_id)
+                if employer_id else None
             )
-            for conversation_id, data in conversations
-        ]
+
+            worker_result = (
+                self.user_repo.get_by_id(worker_id)
+                if worker_id else None
+            )
+
+            employer_name = None
+            worker_name = None
+
+            if employer_result:
+                _, employer = employer_result
+                employer_name = (
+                    f"{employer.get('first_name') or ''} "
+                    f"{employer.get('last_name') or ''}"
+                ).strip() or None
+
+            if worker_result:
+                _, worker = worker_result
+                worker_name = (
+                    f"{worker.get('first_name') or ''} "
+                    f"{worker.get('last_name') or ''}"
+                ).strip() or None
+
+            conversation_data = ConversationDocument.to_response(
+                conversation_id,
+                data,
+            )
+
+            conversation_data["employer_name"] = employer_name
+            conversation_data["worker_name"] = worker_name
+
+            results.append(
+                ConversationResponse(**conversation_data)
+            )
+
+        return results
 
     # ---------------------------------------------------------
     # ACCESS CONTROL

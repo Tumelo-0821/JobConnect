@@ -445,6 +445,15 @@ message,
 );
 },
 
+async addJobLabel(conversationId, jobId) {
+  return request(
+    `/chat/conversations/${encodeURIComponent(conversationId)}/jobs/${encodeURIComponent(jobId)}`,
+    {
+      method: 'POST',
+    }
+  );
+},
+
 async markMessageAsRead(messageId) {
 return request(`/chat/messages/${messageId}/read`, {
 method: 'PATCH',

@@ -3,7 +3,7 @@ import Navbar from '../../components/Navbar/Navbar';
 import './WorkersPage.css';
 
 const API_BASE_URL = (
-  process.env.REACT_APP_API_URL || 'http://localhost:8000'
+  process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1'
 ).replace(/\/$/, '');
 
 function getWorkerSkills(worker) {

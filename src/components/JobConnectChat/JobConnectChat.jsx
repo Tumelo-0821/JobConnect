@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaComments, FaTimes, FaRobot, FaChevronLeft } from 'react-icons/fa';
 import './JobConnectChat.css';
+import { api } from '../../services/api';
 
-function JobConnectChat({ user }) {
+function JobConnectChat({ user, employerId, selectedJob }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [activeConversation, setActiveConversation] = useState(null);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatMessagesLoading, setChatMessagesLoading] = useState(false);
+  const [chatMessagesError, setChatMessagesError] = useState('');
+  const [chatInput, setChatInput] = useState('');
+  const [chatSending, setChatSending] = useState(false);
   const [activeView, setActiveView] = useState('home');
 
   const [messages, setMessages] = useState([
@@ -13,6 +20,10 @@ function JobConnectChat({ user }) {
         "Hi! I'm JobConnect Assistant 👋 I can help you find domestic job opportunities, understand job listings and get help with your application."
     }
   ]);
+
+  const [conversations, setConversations] = useState([]);
+  const [conversationsLoading, setConversationsLoading] = useState(false);
+  const [conversationsError, setConversationsError] = useState('');
 
   const [input, setInput] = useState('');
 
@@ -50,13 +61,115 @@ function JobConnectChat({ user }) {
   function openAssistant() {
     setActiveView('assistant');
   }
+  async function loadChatMessages(conversationId, showLoading = true) {
+    if (!conversationId) return;
+    try {
+      if (showLoading) setChatMessagesLoading(true);
+      setChatMessagesError('');
+      const data = await api.getMessages(conversationId);
+      setChatMessages(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Failed to load chat messages:', error);
+      setChatMessagesError(error.message || 'Unable to load messages.');
+    } finally {
+      if (showLoading) setChatMessagesLoading(false);
+    }
+  }
+
+  function openMessageView(conversation) {
+    if (!conversation?.id) return;
+    setActiveConversation(conversation);
+    setChatMessages([]);
+    setChatInput('');
+    setActiveView('messages');
+    loadChatMessages(conversation.id);
+    if (api.markConversationAsRead) {
+      api.markConversationAsRead(conversation.id).catch(console.error);
+    }
+  }
+
+  async function sendChatMessage(event) {
+    event.preventDefault();
+    const text = chatInput.trim();
+    if (!text || !activeConversation?.id || chatSending) return;
+    try {
+      setChatSending(true);
+      setChatMessagesError('');
+      await api.sendMessage(activeConversation.id, text);
+      setChatInput('');
+      await loadChatMessages(activeConversation.id, false);
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      setChatMessagesError(error.message || 'Unable to send message.');
+    } finally {
+      setChatSending(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!employerId) return;
+    let cancelled = false;
+    setIsOpen(true);
+    setActiveView('conversations');
+    setConversationsError('');
+
+    async function openEmployerConversation() {
+      try {
+        const conversation = await api.getOrCreateConversation(employerId);
+        if (cancelled) return;
+        openMessageView(conversation);
+        loadConversations();
+      } catch (error) {
+        if (cancelled) return;
+        console.error('Failed to open employer conversation:', error);
+        setConversationsError(error.message || 'Unable to open employer conversation.');
+      }
+    }
+    openEmployerConversation();
+    return () => { cancelled = true; };
+  }, [employerId]);
+
+  useEffect(() => {
+    if (!isOpen || activeView !== 'messages' || !activeConversation?.id) return;
+    const conversationId = activeConversation.id;
+    const timer = window.setInterval(() => {
+      loadChatMessages(conversationId, false);
+    }, 5000);
+    return () => window.clearInterval(timer);
+  }, [isOpen, activeView, activeConversation?.id]);
+
+  async function loadConversations() {
+    if (!user) return;
+
+    try {
+      setConversationsLoading(true);
+      setConversationsError('');
+
+      const data = await api.getConversations();
+
+      setConversations(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Failed to load conversations:', error);
+
+      setConversationsError(
+        error.message || 'Unable to load conversations.'
+      );
+    } finally {
+      setConversationsLoading(false);
+    }
+  }
 
   function openConversations() {
     setActiveView('conversations');
+    loadConversations();
   }
 
   function goHome() {
-    setActiveView('home');
+    if (activeView === 'messages') {
+      openConversations();
+    } else {
+      setActiveView('home');
+    }
   }
 
   const userName = user?.name || 'there';
@@ -228,30 +341,115 @@ function JobConnectChat({ user }) {
             </div>
           )}
 
-          {activeView === 'conversations' && (
-            <div className="conversations-view">
-
-              <div className="conversation-empty">
-                <div className="conversation-empty-icon">
-                  <FaComments />
-                </div>
-
-                <h4>Your conversations</h4>
-
-                <p>
-                  Conversations with employers and workers will appear here.
-                </p>
-
-                <button
-                  onClick={() => window.location.href = '/chat'}
-                >
-                  Open Chat
-                </button>
+          {activeView === 'messages' && (
+            <div className="conversations-view" style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'flex-start', padding: '12px', minHeight: 0, overflow: 'hidden' }}>
+              <strong style={{ marginBottom: 10 }}>
+                {user?.role === 'worker'
+                  ? activeConversation?.employer_name || 'Employer'
+                  : activeConversation?.worker_name || 'Worker'}
+              </strong>
+              <div aria-live="polite" style={{ flex: 1, overflowY: 'auto', minHeight: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {chatMessagesLoading ? (
+                  <p>Loading messages...</p>
+                ) : chatMessages.length === 0 ? (
+                  <p>No messages yet. Say hello!</p>
+                ) : (
+                  chatMessages.map((message, index) => {
+                    const senderId = message.sender_id || message.senderId;
+                    const isMine = senderId && String(senderId) === String(user?.id);
+                    return (
+                      <div key={message.id || index} style={{ alignSelf: isMine ? 'flex-end' : 'flex-start', maxWidth: '85%', padding: '9px 12px', borderRadius: 12, background: isMine ? '#e2e8f0' : '#f1f5f9', overflowWrap: 'anywhere' }}>
+                        {message.message || message.text || message.content || ''}
+                      </div>
+                    );
+                  })
+                )}
               </div>
-
+              {chatMessagesError && <p role="alert" style={{ color: '#b91c1c', fontSize: 12 }}>{chatMessagesError}</p>}
+              <form onSubmit={sendChatMessage} style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                <input
+                  type="text"
+                  aria-label="Message employer or worker"
+                  placeholder="Type a message..."
+                  value={chatInput}
+                  onChange={(event) => setChatInput(event.target.value)}
+                  style={{ flex: 1, minWidth: 0, padding: 10, border: '1px solid #cbd5e1', borderRadius: 8 }}
+                />
+                <button type="submit" disabled={!chatInput.trim() || chatSending} style={{ padding: '10px 14px', border: 0, borderRadius: 8, background: '#061626', color: 'white', cursor: 'pointer' }}>
+                  {chatSending ? 'Sending...' : 'Send'}
+                </button>
+              </form>
             </div>
           )}
 
+          {activeView === 'conversations' && (
+            <div className="conversations-view">
+
+              {conversationsLoading ? (
+                <div className="conversation-empty">
+                  <p>Loading your conversations...</p>
+                </div>
+
+              ) : conversationsError ? (
+                <div className="conversation-empty">
+                  <p>{conversationsError}</p>
+
+                  <button type="button" onClick={loadConversations}>
+                    Try Again
+                  </button>
+                </div>
+
+              ) : conversations.length === 0 ? (
+                <div className="conversation-empty">
+                  <div className="conversation-empty-icon">
+                    <FaComments />
+                  </div>
+
+                  <h4>Your conversations</h4>
+
+                  <p>
+                    You don't have any conversations yet.
+                    When you chat with an employer,
+                    your conversations will appear here.
+                  </p>
+                </div>
+
+              ) : (
+                <div className="conversation-list">
+
+                  {conversations.map((conversation) => {
+                    const isWorker = user?.role === 'worker';
+
+                    const otherUserName = isWorker
+                      ? conversation.employer_name || 'Employer'
+                      : conversation.worker_name || 'Worker';
+
+                    return (
+                      <button
+                        key={conversation.id}
+                        type="button"
+                        className="conversation-item"
+                        onClick={() => openMessageView(conversation)}
+                      >
+                        <div className="conversation-item-info">
+
+                          <strong>{otherUserName}</strong>
+
+                          <p>
+                            {conversation.last_message ||
+                              'Start a conversation'}
+                          </p>
+
+                        </div>
+                      </button>
+                    );
+                  })}
+
+                </div>
+              )}
+
+  </div>
+)}
         </div>
       )}
     </>

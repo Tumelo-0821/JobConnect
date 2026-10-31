@@ -147,6 +147,55 @@ class FirestoreChatRepository:
 
         return message_id, message_data.copy()
 
+    def create_job_label(
+            self,
+            conversation_id: str,
+            job_id: str,
+            job_title: str,
+        ) -> tuple[str, dict[str, Any]]:
+
+            conversation = self.get_conversation(conversation_id)
+
+            if not conversation:
+                raise KeyError("Conversation not found")
+
+            # Use a predictable ID to prevent duplicate labels
+            label_id = f"job_{conversation_id}_{job_id}"
+            label_ref = self.messages_collection.document(label_id)
+
+            existing = label_ref.get()
+
+            if existing.exists:
+                return existing.id, existing.to_dict()
+
+            now = utc_now()
+
+            label_data = {
+                "conversation_id": conversation_id,
+                "sender_id": "",
+                "message": "",
+                "is_read": True,
+                "created_at": now,
+                "type": "job_label",
+                "job_id": job_id,
+                "job_title": job_title,
+            }
+
+            try:
+                label_ref.create(label_data)
+            except Exception:
+                # Another request may have created the same label.
+                existing = label_ref.get()
+                if not existing.exists:
+                    raise
+                return existing.id, existing.to_dict()
+
+            self.conversations_collection.document(
+                conversation_id
+            ).update({"updated_at": now})
+
+            return label_id, label_data
+
     def get_message(
         self,
         message_id: str,

@@ -18,6 +18,7 @@ import JobsPage from './pages/Jobs/JobsPage';
 import WorkersPage from './pages/Workers/WorkersPage';
 
 import ChatPage from './pages/Chat/ChatPage';
+import JobConnectChat from './components/JobConnectChat/JobConnectChat';
 import HowItWorks from './pages/HowItWorks';
 
 import { getStoredUser, clearAuth, api } from './services/api';
@@ -121,7 +122,8 @@ function HomeRoute({ user, onLogout, authLoading }) {
 function App() {
   const [user, setUser] = useState(getStoredUser);
   const [authLoading, setAuthLoading] = useState(!!getStoredUser());
-
+  const [chatEmployerId, setChatEmployerId] = useState(null);
+  const [chatJob, setChatJob] = useState(null);
   // ==========================================
   // AUTHENTICATION
   // ==========================================
@@ -156,10 +158,25 @@ function App() {
     setUser(null);
   }
 
+  function handleOpenEmployerChat(employerId, jobId, jobTitle) {
+    if (!employerId) {
+      console.error('Cannot open chat: employer ID is missing.');
+      return;
+    }
+
+    setChatJob({
+      id: jobId,
+      title: jobTitle,
+    });
+
+    setChatEmployerId(employerId);
+  }
+
   const sharedProps = {
     user,
     onLogout: handleLogout,
     authLoading,
+    onOpenEmployerChat: handleOpenEmployerChat,
   };
 
   // ==========================================
@@ -299,6 +316,13 @@ function App() {
         />
 
       </Routes>
+    {user && (
+      <JobConnectChat
+        user={user}
+        employerId={chatEmployerId}
+        selectedJob={chatJob}
+      />
+    )}
     </BrowserRouter>
   );
 }

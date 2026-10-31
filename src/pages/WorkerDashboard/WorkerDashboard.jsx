@@ -15,7 +15,7 @@ import {
   FaCalendarAlt,
 } from 'react-icons/fa';
 
-function WorkerDashboard({ user, onLogout, authLoading }) {
+function WorkerDashboard({ user, onLogout, authLoading, onOpenEmployerChat }) {
   const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState([]);
@@ -224,6 +224,12 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
     const isApplying = applyingId === job.id;
     const unavailable = isJobUnavailable(job);
 
+    console.log('Job chat details:', {
+      jobId: job.id,
+      employerId: job.employer_id,
+      employerName: job.employer_name
+    });
+
     return (
       <div key={job.id} className="job-card">
         <div className="job-card-top">
@@ -264,6 +270,7 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
         </div>
 
         <div className="job-card-actions">
+
           <button
             className="apply-btn"
             onClick={() => handleApply(job.id)}
@@ -284,8 +291,15 @@ function WorkerDashboard({ user, onLogout, authLoading }) {
           <button
             type="button"
             className="chat-negotiate-btn"
-            disabled
-            title="Chat and pay negotiation are not available yet"
+            onClick={() =>
+              onOpenEmployerChat(
+                job.employer_id,
+                job.id,
+                job.title
+              )
+            }
+            disabled={!job.employer_id}
+            title="Chat with employer"
           >
             💬 Chat &amp; Negotiate
           </button>

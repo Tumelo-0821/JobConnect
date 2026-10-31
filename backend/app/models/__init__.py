@@ -378,4 +378,7 @@ class MessageDocument:
             "message": data.get("message"),
             "is_read": bool(data.get("is_read", False)),
             "created_at": data.get("created_at"),
+            "type": data.get("type", "text"),
+            "job_id": data.get("job_id"),
+            "job_title": data.get("job_title"),
         }
