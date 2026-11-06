@@ -26,16 +26,23 @@ function PostJobPage({ user, onLogout }) {
   const [error, setError] = useState('');
 
   const [formData, setFormData] = useState({
-    title: '',
-    category: '',
-    description: '',
-    budget: '',
-    location: '',
-    province: '',
-    duration: '',
-    closing_date: '',
-    closing_time: '23:59',
-  });
+  title: '',
+  category: '',
+  description: '',
+  budget: '',
+  location: '',
+  province: '',
+  duration: '',
+  closing_date: '',
+  closing_time: '23:59',
+
+  // Optional ATS requirements
+  required_skills: '',
+  required_qualifications: '',
+  required_experience: '',
+  required_certifications: '',
+  ats_keywords: '',
+});
 
   if (!user) {
     navigate('/login');
@@ -320,6 +327,72 @@ function PostJobPage({ user, onLogout }) {
                 should close. Urgency updates automatically as the deadline approaches.
               </small>
 
+             {/* OPTIONAL ATS REQUIREMENTS */}
+<div className="ats-requirements-section">
+  <h2>ATS Requirements (Optional)</h2>
+
+  <p>
+    Add requirements to help our Applicant Tracking System (ATS)
+    identify candidates who best match your job.
+    You can leave these fields blank.
+  </p>
+
+  <div className="form-group">
+    <label>Required Skills</label>
+    <textarea
+      name="required_skills"
+      placeholder="e.g. Painting, plumbing, communication, customer service"
+      value={formData.required_skills}
+      onChange={handleChange}
+      maxLength={2000}
+    />
+  </div>
+
+  <div className="form-group">
+    <label>Required Qualifications</label>
+    <textarea
+      name="required_qualifications"
+      placeholder="e.g. Grade 12, Diploma in Electrical Engineering"
+      value={formData.required_qualifications}
+      onChange={handleChange}
+      maxLength={2000}
+    />
+  </div>
+
+  <div className="form-group">
+    <label>Required Experience</label>
+    <input
+      type="text"
+      name="required_experience"
+      placeholder="e.g. 2 years of plumbing experience"
+      value={formData.required_experience}
+      onChange={handleChange}
+      maxLength={500}
+    />
+  </div>
+
+  <div className="form-group">
+    <label>Required Certifications</label>
+    <textarea
+      name="required_certifications"
+      placeholder="e.g. First Aid, Electrical Trade Certificate"
+      value={formData.required_certifications}
+      onChange={handleChange}
+      maxLength={2000}
+    />
+  </div>
+
+  <div className="form-group">
+    <label>Additional ATS Keywords</label>
+    <textarea
+      name="ats_keywords"
+      placeholder="e.g. safety, maintenance, teamwork, driving licence"
+      value={formData.ats_keywords}
+      onChange={handleChange}
+      maxLength={2000}
+    />
+  </div>
+</div>
               <button
                 type="submit"
                 className="submit-job-btn"

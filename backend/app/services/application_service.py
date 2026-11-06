@@ -406,3 +406,67 @@ class ApplicationService:
             "cv_file_name": cv_file_name,
             "cv_storage_path": cv_path,
         }
+    def get_application_documents(
+        self,
+        employer_id: str,
+        job_id: str,
+        app_id: str,
+    ) -> list:
+        # Check that the job exists.
+        job_result = self.job_repo.get_by_id(job_id)
+        if not job_result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Job not found",
+            )
+
+        _, job_data = job_result
+
+        # Make sure this employer owns the job.
+        if job_data.get("employer_id") != employer_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to view these documents",
+            )
+
+        # Check that the application exists.
+        app_result = self.app_repo.get_by_id(app_id)
+        if not app_result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Application not found",
+            )
+
+        _, app_data = app_result
+
+        # Make sure this application belongs to this job.
+        if app_data.get("job_id") != job_id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Application not found",
+            )
+
+        worker_id = app_data.get("worker_id")
+        if not worker_id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Worker not found",
+            )
+
+        # Get the worker's supporting documents.
+        worker_result = self.user_repo.get_by_id(worker_id)
+        if not worker_result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Worker not found",
+            )
+
+        _, worker_data = worker_result
+
+        if worker_data.get("role") != "worker":
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Worker not found",
+            )
+
+        return worker_data.get("documents", [])

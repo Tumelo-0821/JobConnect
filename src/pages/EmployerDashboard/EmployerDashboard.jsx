@@ -21,6 +21,11 @@ function EmployerDashboard({ user, onLogout, authLoading }) {
   const [shortlisted, setShortlisted] = useState([]);
   const [postedJobs, setPostedJobs] = useState([]);
   const [allApplications, setAllApplications] = useState([]);
+  // ATS shortlist
+  const [atsJobId, setAtsJobId] = useState('');
+  const [atsLimit, setAtsLimit] = useState('5');
+  const [atsResults, setAtsResults] = useState(null);
+  const [atsLoading, setAtsLoading] = useState(false);
   const [updatingApplicationId, setUpdatingApplicationId] = useState(null);
   const [workers, setWorkers] = useState([]);
   const [totalApplications, setTotalApplications] = useState(0);
@@ -29,6 +34,8 @@ function EmployerDashboard({ user, onLogout, authLoading }) {
   const [closingJobId, setClosingJobId] = useState(null);
   const [expandedHiredWorker, setExpandedHiredWorker] = useState(null);
   const [expandedApplicationId, setExpandedApplicationId] = useState(null);
+  const [applicationDocuments, setApplicationDocuments] = useState({});
+  const [loadingDocumentsId, setLoadingDocumentsId] = useState(null);
   const [rejectionApplication, setRejectionApplication] = useState(null);
   const [rejectionMessage, setRejectionMessage] = useState('');
   const [rejecting, setRejecting] = useState(false);
@@ -74,6 +81,28 @@ function EmployerDashboard({ user, onLogout, authLoading }) {
     setAllApplications(applications);
     return applications;
   }
+
+  async function handleRunATS() {
+  if (!atsJobId) {
+    setError('Please select a job to run the ATS shortlist.');
+    return;
+  }
+
+  setAtsLoading(true);
+  setError('');
+  setAtsResults(null);
+
+  try {
+    const limit = atsLimit === 'all' ? null : Number(atsLimit);
+    const results = await api.getATSShortlist(atsJobId, limit);
+    setAtsResults(results);
+  } catch (err) {
+    console.error('Failed to run ATS shortlist:', err);
+    setError(err.message || 'Failed to run ATS shortlist.');
+  } finally {
+    setAtsLoading(false);
+  }
+}
 
   useEffect(() => {
     if (!user || user.role !== 'employer') {
@@ -236,6 +265,82 @@ function EmployerDashboard({ user, onLogout, authLoading }) {
       setError(err.message || 'Failed to download CV.');
     }
   }
+
+async function loadApplicationDocuments(jobId, applicationId) {
+  setLoadingDocumentsId(applicationId);
+  setError('');
+
+  try {
+    const documents = await api.getApplicationSupportingDocuments(
+      jobId,
+      applicationId
+    );
+
+    setApplicationDocuments((previous) => ({
+      ...previous,
+      [applicationId]: Array.isArray(documents) ? documents : [],
+    }));
+  } catch (err) {
+    setError(err.message || 'Failed to load supporting documents.');
+  } finally {
+    setLoadingDocumentsId(null);
+  }
+}
+
+
+async function handleViewSupportingDocument(
+  jobId,
+  applicationId,
+  supportingDocument
+) {
+  try {
+    const blob = await api.getApplicationSupportingDocument(
+      jobId,
+      applicationId,
+      supportingDocument.id
+    );
+
+    const fileUrl = window.URL.createObjectURL(blob);
+
+    window.open(fileUrl, '_blank');
+
+    setTimeout(() => {
+      window.URL.revokeObjectURL(fileUrl);
+    }, 60000);
+  } catch (err) {
+    setError(err.message || 'Failed to open supporting document.');
+  }
+}
+
+async function handleDownloadSupportingDocument(
+  jobId,
+  applicationId,
+  supportingDocument
+) {
+  try {
+    const blob = await api.getApplicationSupportingDocument(
+      jobId,
+      applicationId,
+      supportingDocument.id
+    );
+
+    const fileUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = fileUrl;
+    link.download = supportingDocument.document_name || 'supporting-document';
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => {
+      window.URL.revokeObjectURL(fileUrl);
+    }, 60000);
+  } catch (err) {
+    setError(err.message || 'Failed to download supporting document.');
+  }
+}
 
   async function handleMarkWorkCompleted(application) {
     const confirmed = window.confirm(
@@ -666,6 +771,83 @@ function EmployerDashboard({ user, onLogout, authLoading }) {
                                 No CV uploaded by this worker.
                               </div>
                             )}
+
+                                                      <div className="worker-documents-section">
+                              <h4>Supporting Documents</h4>
+
+                              {!applicationDocuments[application.id] ? (
+                                <button
+                                  type="button"
+                                  className="cv-view-btn"
+                                  onClick={() =>
+                                    loadApplicationDocuments(
+                                      application.job_id,
+                                      application.id
+                                    )
+                                  }
+                                  disabled={
+                                    loadingDocumentsId === application.id
+                                  }
+                                >
+                                  {loadingDocumentsId === application.id
+                                    ? 'Loading Documents...'
+                                    : 'View Supporting Documents'}
+                                </button>
+                              ) : applicationDocuments[application.id].length === 0 ? (
+                                <p className="no-cv-message">
+                                  No supporting documents uploaded by this worker.
+                                </p>
+                              ) : (
+                                applicationDocuments[application.id].map(
+                                  (supportingDocument) => (
+                                    <div
+                                      className="worker-document-item"
+                                      key={supportingDocument.id}
+                                    >
+                                      <div className="worker-document-name">
+                                        <strong>
+                                          {supportingDocument.document_name}
+                                        </strong>
+                                        <span>
+                                          {' '}({supportingDocument.document_type})
+                                        </span>
+                                      </div>
+
+                                      <div className="worker-cv-buttons">
+                                        <button
+                                          type="button"
+                                          className="cv-view-btn"
+                                          onClick={() =>
+                                            handleViewSupportingDocument(
+                                              application.job_id,
+                                              application.id,
+                                              supportingDocument
+                                            )
+                                          }
+                                        >
+                                          View Document
+                                        </button>
+
+                                        <button
+                                          type="button"
+                                          className="cv-download-btn"
+                                          onClick={() =>
+                                            handleDownloadSupportingDocument(
+                                              application.job_id,
+                                              application.id,
+                                              supportingDocument
+                                            )
+                                          }
+                                        >
+                                          Download Document
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )
+                                )
+                              )}
+                            </div>
+
                           </div>
                         )}
                       </div>
@@ -748,380 +930,825 @@ function EmployerDashboard({ user, onLogout, authLoading }) {
               </div>
             </div>
 
-            <div className="emp-right">
-              <div className="shortlist-card">
-                <h3>
-                  <FaStar /> Shortlisted Workers ({shortlistedWorkers.length})
-                </h3>
 
-                {shortlistedWorkers.length === 0 ? (
-                  <p
-                    style={{
-                      color: '#9ca3af',
-                      fontSize: '0.85rem',
-                      textAlign: 'center',
-                      padding: '20px 0',
-                    }}
-                  >
-                    No workers shortlisted yet.
-                    <br />
-                    Click Save on any worker to add them here.
-                  </p>
-                ) : (
-                  shortlistedWorkers.map(worker => (
-                    <div key={worker.id} className="shortlist-item">
-                      <div className="shortlist-avatar">👷</div>
+<div className="emp-right">
 
-                      <div>
-                        <div className="shortlist-name">{worker.name}</div>
-                        <div className="shortlist-skill">{worker.skill}</div>
+  {/* ATS RECOMMENDED CANDIDATES */}
+  <div className="section-card ats-card">
+    <h3 style={{ marginBottom: '14px' }}>
+      <FaStar /> ATS Recommended Candidates
+    </h3>
+
+    <p style={{ color: '#6b7280', fontSize: '0.88rem', marginBottom: '14px' }}>
+      Run the ATS to assess applications and rank candidates according to
+      the requirements of your job. The ATS provides recommendations;
+      you make the final hiring decision.
+    </p>
+
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <label htmlFor="ats-job-select" style={{ fontWeight: '600', fontSize: '0.9rem' }}>
+        Select a job
+      </label>
+
+      <select
+        id="ats-job-select"
+        value={atsJobId}
+        onChange={event => {
+          setAtsJobId(event.target.value);
+          setAtsResults(null);
+          setError('');
+        }}
+        style={{
+          width: '100%',
+          padding: '10px',
+          border: '1px solid #d1d5db',
+          borderRadius: '8px',
+          background: '#fff',
+        }}
+      >
+        <option value="">Choose an open job</option>
+        {postedJobs
+          .filter(job => job.status === 'open')
+          .map(job => (
+            <option key={job.id} value={job.id}>
+              {job.title}
+            </option>
+          ))}
+      </select>
+
+      <label htmlFor="ats-limit-select" style={{ fontWeight: '600', fontSize: '0.9rem' }}>
+        Number of candidates
+      </label>
+
+      <select
+        id="ats-limit-select"
+        value={atsLimit}
+        onChange={event => {
+          setAtsLimit(event.target.value);
+          setAtsResults(null);
+        }}
+        style={{
+          width: '100%',
+          padding: '10px',
+          border: '1px solid #d1d5db',
+          borderRadius: '8px',
+          background: '#fff',
+        }}
+      >
+        <option value="5">Top 5 candidates</option>
+        <option value="20">Top 20 candidates</option>
+        <option value="all">All applicants</option>
+      </select>
+
+      <button
+        type="button"
+        className="hire-btn"
+        onClick={handleRunATS}
+        disabled={!atsJobId || atsLoading}
+        style={{
+          width: '100%',
+          padding: '11px',
+          opacity: !atsJobId || atsLoading ? 0.6 : 1,
+          cursor: !atsJobId || atsLoading ? 'not-allowed' : 'pointer',
+        }}
+      >
+        {atsLoading ? 'Assessing Applications...' : 'Run ATS Shortlist'}
+      </button>
+    </div>
+
+    {postedJobs.filter(job => job.status === 'open').length === 0 && (
+      <p style={{ color: '#9ca3af', fontSize: '0.85rem', marginTop: '12px' }}>
+        You need an open job before running the ATS.
+      </p>
+    )}
+
+    {atsResults && (
+      <div style={{ marginTop: '18px' }}>
+        <div
+          style={{
+            padding: '12px',
+            background: '#eff6ff',
+            borderRadius: '8px',
+            marginBottom: '14px',
+          }}
+        >
+          <h4 style={{ margin: '0 0 10px', color: '#1e40af' }}>
+            {atsResults.job_title || 'ATS Results'}
+          </h4>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <div>
+              <strong>{atsResults.total_applications ?? 0}</strong>
+              <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                Total applications
+              </div>
+            </div>
+
+            <div>
+              <strong>{atsResults.assessed_count ?? 0}</strong>
+              <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                Assessed
+              </div>
+            </div>
+
+            <div>
+              <strong>{atsResults.shortlisted_count ?? 0}</strong>
+              <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                Recommended
+              </div>
+            </div>
+
+            <div>
+              <strong>{atsResults.not_assessed_count ?? 0}</strong>
+              <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                Not assessed
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p style={{ fontSize: '0.82rem', color: '#64748b', lineHeight: '1.5' }}>
+          {atsResults.message || 'ATS assessment completed. Review the candidates below.'}
+        </p>
+
+        {(() => {
+          const candidates =
+            atsLimit === 'all'
+              ? (atsResults.all_applicants || atsResults.shortlisted_candidates || [])
+              : (atsResults.shortlisted_candidates || []);
+
+          return (
+            <>
+              <h4 style={{ margin: '16px 0 10px' }}>
+                {atsLimit === 'all'
+                  ? 'All Applicants'
+                  : 'Recommended Candidates'}
+                {' '}({candidates.length})
+              </h4>
+
+              {candidates.length === 0 ? (
+                <p style={{ color: '#9ca3af', fontSize: '0.85rem' }}>
+                  No candidates were returned for this job.
+                </p>
+              ) : (
+                candidates.map((candidate, index) => {
+                  const analysis = candidate.analysis || {};
+                  const assessed = candidate.assessment_status === 'assessed';
+
+                  return (
+                    <div
+                      key={candidate.application_id || candidate.worker_id || index}
+                      style={{
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '10px',
+                        padding: '12px',
+                        marginBottom: '12px',
+                        background: '#fff',
+                      }}
+                    >
+                      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <div className="shortlist-avatar">
+                          {candidate.worker_name
+                            ? candidate.worker_name.trim().charAt(0).toUpperCase()
+                            : 'W'}
+                        </div>
+
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <strong>
+                            {candidate.worker_name || 'Worker'}
+                          </strong>
+
+                          <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                            Candidate {index + 1}
+                          </div>
+                        </div>
                       </div>
 
-                      <button
-                        className="shortlist-chat-btn"
-                        onClick={() => navigate(`/chat/${worker.id}`)}
-                      >
-                        💬 Chat
-                      </button>
-                    </div>
-                  ))
-                )}
-              </div>
+                      <div style={{ marginTop: '12px' }}>
+                        {assessed ? (
+                          <>
+                            <div
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                gap: '8px',
+                                marginBottom: '6px',
+                              }}
+                            >
+                              <strong style={{ fontSize: '0.9rem' }}>
+                                Overall match
+                              </strong>
 
-              <div className="shortlist-card hired-workers-card">
-                <h3>
-                  <FaCheckCircle /> Hired Workers ({hiredApplications.length})
-                </h3>
+                              <strong style={{ color: '#15803d' }}>
+                                {candidate.overall_score != null
+                                  ? `${Number(candidate.overall_score).toFixed(1)}%`
+                                  : 'Unavailable'}
+                              </strong>
+                            </div>
 
-                {hiredApplications.length === 0 ? (
-                  <p
-                    style={{
-                      color: '#9ca3af',
-                      fontSize: '0.85rem',
-                      textAlign: 'center',
-                      padding: '20px 0',
-                    }}
-                  >
-                    No workers hired yet.
-                  </p>
-                ) : (
-                  hiredApplications.map(application => (
-                    <div
-                      key={application.id}
-                      className="shortlist-item"
-                      style={{ flexWrap: 'wrap', alignItems: 'flex-start' }}
-                    >
-                      <div className="shortlist-avatar"><div className="worker-result-avatar">
-                              {application.worker_name
-                                ? application.worker_name.trim().charAt(0).toUpperCase()
-                                : 'W'}
-                            </div></div>
+                            <div
+                              style={{
+                                height: '8px',
+                                background: '#e5e7eb',
+                                borderRadius: '10px',
+                                overflow: 'hidden',
+                              }}
+                            >
+                              <div
+                                style={{
+                                  height: '100%',
+                                  width: `${Math.max(0, Math.min(100, Number(candidate.overall_score) || 0))}%`,
+                                  background: '#16a34a',
+                                  borderRadius: '10px',
+                                }}
+                              />
+                            </div>
 
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div className="shortlist-name">
-                          {application.worker_name || 'Worker'}
-                        </div>
-
-                        <div className="shortlist-skill">
-                          {application.job_title}
-                        </div>
-
-                        {expandedHiredWorker === application.id && (
+                            <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '6px' }}>
+                              Assessment coverage: {
+                                candidate.assessment_coverage != null
+                                  ? `${Number(candidate.assessment_coverage).toFixed(1)}%`
+                                  : 'Unavailable'
+                              }
+                            </div>
+                          </>
+                        ) : (
                           <div
                             style={{
-                              marginTop: '12px',
-                              padding: '12px',
-                              background: '#f9fafb',
-                              borderRadius: '8px',
-                              fontSize: '0.85rem',
-                              lineHeight: '1.6',
+                              padding: '9px',
+                              background: '#fff7ed',
+                              color: '#9a3412',
+                              borderRadius: '6px',
+                              fontSize: '0.83rem',
                             }}
                           >
-                            <div>
-                              <strong>Email:</strong> {application.worker_email || 'Not provided'}
-                            </div>
-                            <div>
-                              <strong>Phone:</strong> {application.worker_phone || 'Not provided'}
-                            </div>
-                            <div>
-                              <strong>Skills:</strong>{' '}
-                              {application.worker_skills?.length
-                                ? application.worker_skills.join(', ')
-                                : 'No skills listed'}
-                            </div>
-                            <div>
-                              <strong>Province:</strong> {application.worker_province || 'Not provided'}
-                            </div>
-                            <div style={{ marginTop: '8px' }}>
-                              <strong>About Me:</strong>
-                              <p style={{ margin: '4px 0 0', color: '#6b7280' }}>
-                                {application.worker_bio || 'No bio provided'}
-                              </p>
-                            </div>
+                            <strong>Not assessed</strong>
+                            <p style={{ margin: '4px 0 0' }}>
+                              {candidate.reason || 'There is insufficient CV evidence to assess this candidate.'}
+                            </p>
                           </div>
                         )}
                       </div>
 
-                      <div
-                        style={{
-                          display: 'flex',
-                          gap: '8px',
-                          alignItems: 'center',
-                          flexWrap: 'wrap',
-                        }}
-                      >
-                        <button
-                          type="button"
-                          className="shortlist-chat-btn"
-                          onClick={() => navigate(`/chat/${application.worker_id}`)}
-                        >
-                          💬 Chat
-                        </button>
+                      {assessed && (
+                        <div style={{ marginTop: '12px', fontSize: '0.83rem' }}>
+                          <div style={{ marginBottom: '8px' }}>
+                            <strong>Matched skills:</strong>
+                            <p style={{ margin: '4px 0', color: '#15803d' }}>
+                              {analysis.matched_skills?.length
+                                ? analysis.matched_skills.join(', ')
+                                : 'No matched skills listed'}
+                            </p>
+                          </div>
 
-                        <button
-                          type="button"
-                          className="shortlist-chat-btn"
-                          onClick={() =>
-                            setExpandedHiredWorker(
-                              expandedHiredWorker === application.id
-                                ? null
-                                : application.id
-                            )
-                          }
-                        >
-                          {expandedHiredWorker === application.id
-                            ? 'Hide Details'
-                            : 'Learn More'}
-                        </button>
+                          <div style={{ marginBottom: '8px' }}>
+                            <strong>Missing skills:</strong>
+                            <p style={{ margin: '4px 0', color: '#b45309' }}>
+                              {analysis.missing_skills?.length
+                                ? analysis.missing_skills.join(', ')
+                                : 'No missing skills listed'}
+                            </p>
+                          </div>
+
+                          {analysis.detected_experience_years != null && (
+                            <div style={{ marginBottom: '8px' }}>
+                              <strong>Detected experience:</strong>
+                              {' '}{analysis.detected_experience_years} years
+                            </div>
+                          )}
+
+                          {analysis.detected_education_keywords?.length > 0 && (
+                            <div style={{ marginBottom: '8px' }}>
+                              <strong>Education detected:</strong>
+                              <p style={{ margin: '4px 0', color: '#64748b' }}>
+                                {analysis.detected_education_keywords.join(', ')}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      <div style={{ marginTop: '12px', fontSize: '0.82rem' }}>
+                        <strong>Application status:</strong>
+                        {' '}{candidate.application_status || 'Unknown'}
                       </div>
 
-                      {/* Work completion and worker review controls */}
-                      <div
-                        style={{
-                          width: '100%',
-                          marginTop: '10px',
-                          paddingTop: '10px',
-                          borderTop: '1px solid #e5e7eb',
-                        }}
-                      >
-                        {application.review_submitted ? (
-                          <div style={{ color: '#15803d', fontSize: '0.9rem' }}>
-                            <FaCheckCircle /> Review submitted
-                            {application.worker_rating != null && (
-                              <div style={{ marginTop: '4px' }}>
-                                Your rating:{' '}
-                                <span style={{ color: '#f59e0b' }}>
-                                  {'★'.repeat(
-                                    Math.max(
-                                      0,
-                                      Math.min(5, Number(application.worker_rating))
-                                    )
-                                  )}
-                                  {'☆'.repeat(
-                                    5 -
-                                      Math.max(
-                                        0,
-                                        Math.min(5, Number(application.worker_rating))
-                                      )
-                                  )}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        ) : application.work_status === 'completed' ? (
-                          <>
-                            <p style={{ margin: '0 0 8px', fontSize: '0.9rem' }}>
-                              Work completed. Please rate this worker.
-                            </p>
+                      {candidate.cv_file_name && (
+                        <div
+                          style={{
+                            display: 'flex',
+                            gap: '8px',
+                            flexWrap: 'wrap',
+                            marginTop: '12px',
+                          }}
+                        >
+                          <button
+                            type="button"
+                            className="cv-view-btn"
+                            onClick={() =>
+                              handleViewCV(
+                                atsResults.job_id,
+                                candidate.application_id
+                              )
+                            }
+                          >
+                            View CV
+                          </button>
 
-                            {reviewingApplicationId !== application.id && (
-                              <button
-                                type="button"
-                                className="shortlist-chat-btn"
-                                onClick={() => {
-                                  setReviewingApplicationId(application.id);
-                                  setError('');
-                                  setReviewMessage('');
-                                }}
-                              >
-                                <FaStar /> Rate Worker
-                              </button>
-                            )}
+                          <button
+                            type="button"
+                            className="cv-download-btn"
+                            onClick={() =>
+                              handleDownloadCV(
+                                atsResults.job_id,
+                                candidate.application_id,
+                                candidate.cv_file_name
+                              )
+                            }
+                          >
+                            Download CV
+                          </button>
+                        </div>
+                      )}
 
-                            {reviewingApplicationId === application.id && (
-                              <div
-                                style={{
-                                  marginTop: '10px',
-                                  padding: '12px',
-                                  border: '1px solid #e5e7eb',
-                                  borderRadius: '8px',
-                                  background: '#fff',
-                                }}
-                              >
-                                <p style={{ margin: '0 0 10px', fontWeight: '600' }}>
-                                  Select a rating
-                                </p>
+              <div className="worker-documents-section">
+  <h4>Supporting Documents</h4>
 
-                                <div
-                                  style={{
-                                    display: 'flex',
-                                    gap: '8px',
-                                    marginBottom: '12px',
-                                  }}
-                                  aria-label="Worker rating"
-                                >
-                                  {[1, 2, 3, 4, 5].map(star => (
-                                    <button
-                                      key={star}
-                                      type="button"
-                                      aria-label={`${star} star${star === 1 ? '' : 's'}`}
-                                      aria-pressed={selectedRatings[application.id] === star}
-                                      onClick={() =>
-                                        setSelectedRatings(previous => ({
-                                          ...previous,
-                                          [application.id]: star,
-                                        }))
-                                      }
-                                      style={{
-                                        border: 'none',
-                                        background: 'transparent',
-                                        cursor: 'pointer',
-                                        fontSize: '1.7rem',
-                                        color:
-                                          star <= (selectedRatings[application.id] || 0)
-                                            ? '#f59e0b'
-                                            : '#d1d5db',
-                                        padding: '2px',
-                                      }}
-                                    >
-                                      ★
-                                    </button>
-                                  ))}
-                                </div>
+  {!applicationDocuments[candidate.application_id] ? (
+    <button
+      type="button"
+      className="cv-view-btn"
+      onClick={() =>
+        loadApplicationDocuments(
+          atsResults.job_id,
+          candidate.application_id
+        )
+      }
+      disabled={
+        loadingDocumentsId === candidate.application_id
+      }
+    >
+      {loadingDocumentsId === candidate.application_id
+        ? 'Loading Documents...'
+        : 'View Supporting Documents'}
+    </button>
+  ) : applicationDocuments[candidate.application_id].length === 0 ? (
+    <p className="no-cv-message">
+      No supporting documents uploaded by this candidate.
+    </p>
+  ) : (
+    applicationDocuments[candidate.application_id].map(
+      (supportingDocument) => (
+        <div
+          className="worker-document-item"
+          key={supportingDocument.id}
+        >
+          <div className="worker-document-name">
+            <strong>{supportingDocument.document_name}</strong>
+            <span> ({supportingDocument.document_type})</span>
+          </div>
 
-                                <label
-                                  htmlFor={`worker-review-${application.id}`}
-                                  style={{
-                                    display: 'block',
-                                    fontSize: '0.9rem',
-                                    marginBottom: '6px',
-                                  }}
-                                >
-                                  Written review (optional)
-                                </label>
+          <div className="worker-cv-buttons">
+            <button
+              type="button"
+              className="cv-view-btn"
+              onClick={() =>
+                handleViewSupportingDocument(
+                  atsResults.job_id,
+                  candidate.application_id,
+                  supportingDocument
+                )
+              }
+            >
+              View Document
+            </button>
 
-                                <textarea
-                                  id={`worker-review-${application.id}`}
-                                  rows={4}
-                                  maxLength={1000}
-                                  placeholder="How was your experience working with this person?"
-                                  value={reviewTexts[application.id] || ''}
-                                  onChange={event =>
-                                    setReviewTexts(previous => ({
-                                      ...previous,
-                                      [application.id]: event.target.value,
-                                    }))
-                                  }
-                                  style={{
-                                    boxSizing: 'border-box',
-                                    width: '100%',
-                                    padding: '10px',
-                                    border: '1px solid #d1d5db',
-                                    borderRadius: '6px',
-                                    resize: 'vertical',
-                                    marginBottom: '10px',
-                                  }}
-                                />
+            <button
+              type="button"
+              className="cv-download-btn"
+              onClick={() =>
+                handleDownloadSupportingDocument(
+                  atsResults.job_id,
+                  candidate.application_id,
+                  supportingDocument
+                )
+              }
+            >
+              Download Document
+            </button>
+          </div>
+        </div>
+      )
+    )
+  )}
+</div>
 
-                                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                                  <button
-                                    type="button"
-                                    className="hire-btn"
-                                    onClick={() => handleSubmitWorkerReview(application)}
-                                    disabled={workActionLoading === application.id}
-                                  >
-                                    {workActionLoading === application.id
-                                      ? 'Submitting...'
-                                      : 'Submit Review'}
-                                  </button>
 
-                                  <button
-                                    type="button"
-                                    className="shortlist-chat-btn"
-                                    onClick={() => setReviewingApplicationId(null)}
-                                    disabled={workActionLoading === application.id}
-                                  >
-                                    Cancel
-                                  </button>
-                                </div>
-                              </div>
-                            )}
-                          </>
-                        ) : (
+                      {candidate.application_status === 'pending' && (
+
+                        <div
+                          style={{
+                            display: 'flex',
+                            gap: '8px',
+                            flexWrap: 'wrap',
+                            marginTop: '12px',
+                          }}
+                        >
                           <button
                             type="button"
                             className="hire-btn"
-                            onClick={() => handleMarkWorkCompleted(application)}
-                            disabled={workActionLoading === application.id}
+                            onClick={() =>
+                              handleApplicationStatus(
+                                atsResults.job_id,
+                                candidate.application_id,
+                                'hired'
+                              )
+                            }
+                            disabled={updatingApplicationId === candidate.application_id}
                           >
-                            {workActionLoading === application.id
-                              ? 'Updating...'
-                              : '✓ Mark Work Completed'}
+                            {updatingApplicationId === candidate.application_id
+                              ? 'Hiring...'
+                              : 'Hire'}
                           </button>
-                        )}
-                      </div>
+
+                          <button
+                            type="button"
+                            className="shortlist-btn"
+                            onClick={() => {
+                              setRejectionApplication({
+                                jobId: atsResults.job_id,
+                                applicationId: candidate.application_id,
+                                workerName: candidate.worker_name || 'Worker',
+                              });
+                              setRejectionMessage('');
+                              setError('');
+                            }}
+                            disabled={updatingApplicationId === candidate.application_id}
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      )}
+
+                      {candidate.application_status === 'hired' && (
+                        <span className="status-badge approved">
+                          ✓ Hired
+                        </span>
+                      )}
+
+                      {candidate.application_status === 'rejected' && (
+                        <span className="status-badge rejected">
+                          Rejected
+                        </span>
+                      )}
                     </div>
-                  ))
-                )}
+                  );
+                })
+              )}
+            </>
+          );
+        })()}
+      </div>
+    )}
+  </div>
+
+  {/* HIRED WORKERS */}
+  <div className="shortlist-card hired-workers-card">
+    <h3>
+      <FaCheckCircle /> Hired Workers ({hiredApplications.length})
+    </h3>
+
+    {hiredApplications.length === 0 ? (
+      <p
+        style={{
+          color: '#9ca3af',
+          fontSize: '0.85rem',
+          textAlign: 'center',
+          padding: '20px 0',
+        }}
+      >
+        No workers hired yet.
+      </p>
+    ) : (
+      hiredApplications.map(application => (
+        <div
+          key={application.id}
+          className="shortlist-item"
+          style={{ flexWrap: 'wrap', alignItems: 'flex-start' }}
+        >
+          <div className="shortlist-avatar">
+            <div className="worker-result-avatar">
+              {application.worker_name
+                ? application.worker_name.trim().charAt(0).toUpperCase()
+                : 'W'}
+            </div>
+          </div>
+
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="shortlist-name">
+              {application.worker_name || 'Worker'}
+            </div>
+
+            <div className="shortlist-skill">
+              {application.job_title}
+            </div>
+
+            {expandedHiredWorker === application.id && (
+              <div
+                style={{
+                  marginTop: '12px',
+                  padding: '12px',
+                  background: '#f9fafb',
+                  borderRadius: '8px',
+                  fontSize: '0.85rem',
+                  lineHeight: '1.6',
+                }}
+              >
+                <div>
+                  <strong>Email:</strong> {application.worker_email || 'Not provided'}
+                </div>
+                <div>
+                  <strong>Phone:</strong> {application.worker_phone || 'Not provided'}
+                </div>
+                <div>
+                  <strong>Skills:</strong>{' '}
+                  {application.worker_skills?.length
+                    ? application.worker_skills.join(', ')
+                    : 'No skills listed'}
+                </div>
+                <div>
+                  <strong>Province:</strong> {application.worker_province || 'Not provided'}
+                </div>
+                <div style={{ marginTop: '8px' }}>
+                  <strong>About Me:</strong>
+                  <p style={{ margin: '4px 0 0', color: '#6b7280' }}>
+                    {application.worker_bio || 'No bio provided'}
+                  </p>
+                </div>
               </div>
+            )}
+          </div>
 
-              <div className="section-card">
-                <h3 style={{ marginBottom: '14px' }}>💡 Quick Tips</h3>
+          <div
+            style={{
+              display: 'flex',
+              gap: '8px',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+            }}
+          >
+            <button
+              type="button"
+              className="shortlist-chat-btn"
+              onClick={() => navigate(`/chat/${application.worker_id}`)}
+            >
+              Chat
+            </button>
 
-                {[
-                  {
-                    icon: <FaCheckCircle />,
-                    tip: 'Always hire verified workers for safety',
-                  },
-                  {
-                    icon: <FaComments />,
-                    tip: 'Chat before hiring to discuss the job',
-                  },
-                  {
-                    icon: <FaStar />,
-                    tip: 'Leave a review after the job is done',
-                  },
-                  {
-                    icon: <FaMapMarkerAlt />,
-                    tip: 'Filter by location for nearby workers',
-                  },
-                ].map((item, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      display: 'flex',
-                      gap: '10px',
-                      alignItems: 'flex-start',
-                      padding: '10px 0',
-                      borderBottom: index < 3 ? '1px solid #f3f4f6' : 'none',
-                    }}
-                  >
-                    <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>
-                      {item.icon}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: '0.85rem',
-                        color: '#6b7280',
-                        lineHeight: '1.5',
-                      }}
-                    >
-                      {item.tip}
+            <button
+              type="button"
+              className="shortlist-chat-btn"
+              onClick={() =>
+                setExpandedHiredWorker(
+                  expandedHiredWorker === application.id
+                    ? null
+                    : application.id
+                )
+              }
+            >
+              {expandedHiredWorker === application.id
+                ? 'Hide Details'
+                : 'Learn More'}
+            </button>
+          </div>
+
+          {/* Work completion and worker review controls */}
+          <div
+            style={{
+              width: '100%',
+              marginTop: '10px',
+              paddingTop: '10px',
+              borderTop: '1px solid #e5e7eb',
+            }}
+          >
+            {application.review_submitted ? (
+              <div style={{ color: '#15803d', fontSize: '0.9rem' }}>
+                <FaCheckCircle /> Review submitted
+                {application.worker_rating != null && (
+                  <div style={{ marginTop: '4px' }}>
+                    Your rating:{' '}
+                    <span style={{ color: '#f59e0b' }}>
+                      {'★'.repeat(
+                        Math.max(
+                          0,
+                          Math.min(5, Number(application.worker_rating))
+                        )
+                      )}
+                      {'☆'.repeat(
+                        5 -
+                          Math.max(
+                            0,
+                            Math.min(5, Number(application.worker_rating))
+                          )
+                      )}
                     </span>
                   </div>
-                ))}
+                )}
               </div>
-            </div>
+            ) : application.work_status === 'completed' ? (
+              <>
+                <p style={{ margin: '0 0 8px', fontSize: '0.9rem' }}>
+                  Work completed. Please rate this worker.
+                </p>
+
+                {reviewingApplicationId !== application.id && (
+                  <button
+                    type="button"
+                    className="shortlist-chat-btn"
+                    onClick={() => {
+                      setReviewingApplicationId(application.id);
+                      setError('');
+                      setReviewMessage('');
+                    }}
+                  >
+                    <FaStar /> Rate Worker
+                  </button>
+                )}
+
+                {reviewingApplicationId === application.id && (
+                  <div
+                    style={{
+                      marginTop: '10px',
+                      padding: '12px',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      background: '#fff',
+                    }}
+                  >
+                    <p style={{ margin: '0 0 10px', fontWeight: '600' }}>
+                      Select a rating
+                    </p>
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: '8px',
+                        marginBottom: '12px',
+                      }}
+                      aria-label="Worker rating"
+                    >
+                      {[1, 2, 3, 4, 5].map(star => (
+                        <button
+                          key={star}
+                          type="button"
+                          aria-label={`${star} star${star === 1 ? '' : 's'}`}
+                          aria-pressed={selectedRatings[application.id] === star}
+                          onClick={() =>
+                            setSelectedRatings(previous => ({
+                              ...previous,
+                              [application.id]: star,
+                            }))
+                          }
+                          style={{
+                            border: 'none',
+                            background: 'transparent',
+                            cursor: 'pointer',
+                            fontSize: '1.7rem',
+                            color:
+                              star <= (selectedRatings[application.id] || 0)
+                                ? '#f59e0b'
+                                : '#d1d5db',
+                            padding: '2px',
+                          }}
+                        >
+                          ★
+                        </button>
+                      ))}
+                    </div>
+
+                    <label
+                      htmlFor={`worker-review-${application.id}`}
+                      style={{
+                        display: 'block',
+                        fontSize: '0.9rem',
+                        marginBottom: '6px',
+                      }}
+                    >
+                      Written review (optional)
+                    </label>
+
+                    <textarea
+                      id={`worker-review-${application.id}`}
+                      rows={4}
+                      maxLength={1000}
+                      placeholder="How was your experience working with this person?"
+                      value={reviewTexts[application.id] || ''}
+                      onChange={event =>
+                        setReviewTexts(previous => ({
+                          ...previous,
+                          [application.id]: event.target.value,
+                        }))
+                      }
+                      style={{
+                        boxSizing: 'border-box',
+                        width: '100%',
+                        padding: '10px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '6px',
+                        resize: 'vertical',
+                        marginBottom: '10px',
+                      }}
+                    />
+
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        className="hire-btn"
+                        onClick={() => handleSubmitWorkerReview(application)}
+                        disabled={workActionLoading === application.id}
+                      >
+                        {workActionLoading === application.id
+                          ? 'Submitting...'
+                          : 'Submit Review'}
+                      </button>
+
+                      <button
+                        type="button"
+                        className="shortlist-chat-btn"
+                        onClick={() => setReviewingApplicationId(null)}
+                        disabled={workActionLoading === application.id}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <button
+                type="button"
+                className="hire-btn"
+                onClick={() => handleMarkWorkCompleted(application)}
+                disabled={workActionLoading === application.id}
+              >
+                {workActionLoading === application.id
+                  ? 'Updating...'
+                  : '✓ Mark Work Completed'}
+              </button>
+            )}
+          </div>
+        </div>
+      ))
+    )}
+  </div>
+
+  {/* MANUALLY SHORTLISTED WORKERS */}
+  <div className="shortlist-card">
+    <h3>
+      <FaStar /> Shortlisted Workers ({shortlistedWorkers.length})
+    </h3>
+
+    {shortlistedWorkers.length === 0 ? (
+      <p
+        style={{
+          color: '#9ca3af',
+          fontSize: '0.85rem',
+          textAlign: 'center',
+          padding: '20px 0',
+        }}
+      >
+        No workers shortlisted yet.
+        <br />
+        Click Save on any worker to add them here.
+      </p>
+    ) : (
+      shortlistedWorkers.map(worker => (
+        <div key={worker.id} className="shortlist-item">
+          <div className="shortlist-avatar">
+            {worker.name
+              ? worker.name.trim().charAt(0).toUpperCase()
+              : 'W'}
+          </div>
+
+          <div>
+            <div className="shortlist-name">{worker.name}</div>
+            <div className="shortlist-skill">{worker.skill}</div>
+          </div>
+
+          <button
+            className="shortlist-chat-btn"
+            onClick={() => navigate(`/chat/${worker.id}`)}
+          >
+            Chat
+          </button>
+        </div>
+      ))
+    )}
+  </div>
+
+</div>
+
+
           </div>
         </div>
       </div>

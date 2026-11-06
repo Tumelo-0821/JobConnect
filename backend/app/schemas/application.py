@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ApplicationStatus(str, Enum):
@@ -40,3 +40,6 @@ class ApplicationResponse(BaseModel):
 class ApplicationStatusUpdate(BaseModel):
     status: ApplicationStatus
     rejection_message: str | None = None
+
+class ShortlistRequest(BaseModel):
+    limit: int | None = Field(default=5, ge=1, le=500)

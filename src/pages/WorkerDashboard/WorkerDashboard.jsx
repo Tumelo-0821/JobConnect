@@ -113,10 +113,13 @@ function WorkerDashboard({ user, onLogout, authLoading, onOpenEmployerChat }) {
   }
 
   async function handleApply(jobId) {
-    if (user?.verified !== true) {
-      setError('Verify your ID before applying for jobs.');
-      return;
-    }
+    if (
+  user?.account_verified !== true &&
+  user?.account_verified !== 'true'
+) {
+  setError('Verify your account through OTP before applying for jobs.');
+  return;
+}
 
     const job = jobs.find((item) => item.id === jobId);
     if (job && isJobUnavailable(job)) {
@@ -272,20 +275,32 @@ function WorkerDashboard({ user, onLogout, authLoading, onOpenEmployerChat }) {
         <div className="job-card-actions">
 
           <button
-            className="apply-btn"
-            onClick={() => handleApply(job.id)}
-            disabled={unavailable || alreadyApplied || isApplying || user?.verified !== true}
-            title={user?.verified !== true ? 'Verify your ID first to apply' : ''}
-          >
-            {unavailable
-              ? 'Applications Closed'
-              : alreadyApplied
-              ? 'Applied'
-              : isApplying
-              ? 'Applying...'
-              : user?.verified !== true
-              ? '🔒 Verify ID to Apply'
-              : 'Apply Now'}
+              className="apply-btn"
+              onClick={() => handleApply(job.id)}
+              disabled={
+                unavailable ||
+                alreadyApplied ||
+                isApplying ||
+                (user?.account_verified !== true &&
+                  user?.account_verified !== 'true')
+              }
+              title={
+                user?.account_verified !== true &&
+                user?.account_verified !== 'true'
+                  ? 'Verify your account through OTP before applying'
+                  : ''
+              }
+             >
+              {unavailable
+                ? 'Applications Closed'
+                : alreadyApplied
+                ? 'Applied'
+                : isApplying
+                ? 'Applying...'
+                : user?.account_verified !== true &&
+                  user?.account_verified !== 'true'
+                ? 'Verify Account to Apply'
+                : 'Apply Now'}
           </button>
 
           <button

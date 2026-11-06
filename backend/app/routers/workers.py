@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, File, UploadFile, Query
 from app.services.cv_service import CVService
+from app.services.document_service import DocumentService
 
 from app.dependencies import (
     get_current_worker,
@@ -25,6 +26,11 @@ def get_cv_service(
     user_repo: UserRepository = Depends(get_user_repository),
 ) -> CVService:
     return CVService(user_repo)
+
+def get_document_service(
+    user_repo: UserRepository = Depends(get_user_repository),
+) -> DocumentService:
+    return DocumentService(user_repo)
 
 
 def get_application_service(
@@ -91,6 +97,28 @@ async def upload_worker_cv(
         worker,
         file,
     )
+
+@router.post("/me/documents", summary="Upload worker supporting document")
+async def upload_worker_document(
+    file: UploadFile = File(...),
+    document_type: str = Query(...),
+    worker: dict = Depends(get_current_worker),
+    document_service: DocumentService = Depends(get_document_service),
+) -> dict:
+    return await document_service.upload_document(
+        worker,
+        file,
+        document_type,
+    )
+
+
+@router.get("/me/documents", summary="List worker supporting documents")
+def list_worker_documents(
+    worker: dict = Depends(get_current_worker),
+    document_service: DocumentService = Depends(get_document_service),
+) -> list:
+    return document_service.list_documents(worker)
+
 
 @router.get(
     "/me/applications",

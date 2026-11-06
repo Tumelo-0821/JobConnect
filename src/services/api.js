@@ -250,6 +250,16 @@ export const api = {
     return request(`/employers/jobs/${jobId}/applications`);
   },
 
+async getATSShortlist(jobId, limit = 5) {
+  return request(
+    `/employers/jobs/${jobId}/applications/shortlist`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ limit }),
+    }
+  );
+},
+
   async updateApplicationStatus(
     jobId,
     applicationId,
@@ -335,6 +345,54 @@ export const api = {
     return response.blob();
   },
 
+  // -------------------- APPLICATION SUPPORTING DOCUMENTS --------------------
+
+  async getApplicationSupportingDocuments(jobId, applicationId) {
+    return request(
+      `/employers/jobs/${jobId}/applications/${applicationId}/documents`,
+      {
+        method: 'GET',
+      }
+    );
+  },
+
+  async getApplicationSupportingDocument(jobId, applicationId, documentId) {
+    const token = getToken();
+
+    const response = await fetch(
+      `${API_BASE}/employers/jobs/${jobId}/applications/${applicationId}/documents/${documentId}`,
+      {
+        method: 'GET',
+        headers: token
+          ? {
+              Authorization: `Bearer ${token}`,
+            }
+          : {},
+      }
+    );
+
+    if (!response.ok) {
+      let message = 'Failed to retrieve supporting document';
+
+      try {
+        const data = await response.json();
+
+        if (data?.detail) {
+          message =
+            typeof data.detail === 'string'
+              ? data.detail
+              : 'Failed to retrieve supporting document';
+        }
+      } catch {
+        // The response was not JSON.
+      }
+
+      throw new Error(message);
+    }
+
+    return response.blob();
+  },
+
   // -------------------- WORKERS --------------------
 
   async getWorkers(search = '', skill = '') {
@@ -385,6 +443,27 @@ export const api = {
 
     return data;
   },
+
+async uploadWorkerDocument(file, documentType) {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const query = new URLSearchParams({
+    document_type: documentType,
+  });
+
+  return request(`/workers/me/documents?${query.toString()}`, {
+    method: 'POST',
+    body: formData,
+  });
+},
+
+
+async getWorkerDocuments() {
+  return request('/workers/me/documents', {
+    method: 'GET',
+  });
+},
 
   async getMyApplications() {
     return request('/workers/me/applications');

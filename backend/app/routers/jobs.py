@@ -9,10 +9,33 @@ from app.dependencies import (
 from app.repositories.memory import JobRepository, UserRepository
 from app.repositories.notification_repository import NotificationRepository
 from app.schemas.auth import MessageResponse
-from app.schemas.job import JobCreateRequest, JobResponse, JobUpdateRequest
+from app.schemas.job import (
+    JobCreateRequest,
+    JobResponse,
+    JobUpdateRequest,
+    JobRequirementExtractionRequest,
+)
 from app.services.job_service import JobService
+from app.schemas.job import JobRequirementExtractionRequest
+from app.services.job_requirement_extraction_service import (
+    JobRequirementExtractionService,
+)
 
 router = APIRouter(prefix="/employers/jobs", tags=["Jobs"])
+router = APIRouter(prefix="/employers/jobs", tags=["Jobs"])
+
+@router.post(
+    "/extract-requirements",
+    summary="Extract suggested requirements from a job description",
+)
+def extract_job_requirements(
+    payload: JobRequirementExtractionRequest,
+    employer: dict = Depends(get_current_employer),
+) -> dict:
+    return JobRequirementExtractionService.extract_requirements(
+        job_title=payload.job_title,
+        job_description=payload.job_description,
+    )
 
 
 def get_job_service(

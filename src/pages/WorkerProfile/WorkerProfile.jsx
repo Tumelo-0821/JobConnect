@@ -21,6 +21,9 @@ function WorkerProfile({ user, onLogout, authLoading }) {
   const [saving, setSaving] = useState(false);
   const [uploadingCV, setUploadingCV] = useState(false);
   const [cvFileName, setCvFileName] = useState(user?.cv_file_name || '');
+  const [uploadingDocument, setUploadingDocument] = useState(false);
+  const [documentType, setDocumentType] = useState('certificate');
+  const [documents, setDocuments] = useState([]);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
@@ -52,6 +55,31 @@ function WorkerProfile({ user, onLogout, authLoading }) {
     navigate('/employer-dashboard');
     return null;
   }
+
+useEffect(() => {
+  let isMounted = true;
+
+  async function loadDocuments() {
+    try {
+      const result = await api.getWorkerDocuments();
+
+      if (isMounted) {
+        setDocuments(Array.isArray(result) ? result : []);
+      }
+    } catch (err) {
+      if (isMounted) {
+        setError(err.message || 'Failed to load supporting documents.');
+      }
+    }
+  }
+
+  loadDocuments();
+
+  return () => {
+    isMounted = false;
+  };
+}, []);
+
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -105,6 +133,54 @@ function WorkerProfile({ user, onLogout, authLoading }) {
       e.target.value = '';
     }
   }
+
+async function handleDocumentUpload(e) {
+  const file = e.target.files?.[0];
+
+  if (!file) return;
+
+  setMessage('');
+  setError('');
+
+  const allowedTypes = [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  ];
+
+  if (!allowedTypes.includes(file.type)) {
+    setError('Please upload a PDF, DOC, or DOCX document.');
+    e.target.value = '';
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    setError('Document must not exceed 5 MB.');
+    e.target.value = '';
+    return;
+  }
+
+  setUploadingDocument(true);
+
+  try {
+    const result = await api.uploadWorkerDocument(
+      file,
+      documentType
+    );
+
+    setDocuments((previousDocuments) => [
+      result.document,
+      ...previousDocuments,
+    ]);
+
+    setMessage('Supporting document uploaded successfully.');
+  } catch (err) {
+    setError(err.message || 'Failed to upload supporting document.');
+  } finally {
+    setUploadingDocument(false);
+    e.target.value = '';
+  }
+}
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -320,7 +396,7 @@ function WorkerProfile({ user, onLogout, authLoading }) {
             </div>
           </div>
 
-                     <div className="form-section">
+          <div className="form-section">
             <h2>Curriculum Vitae (CV)</h2>
 
             <div className="form-group">
@@ -354,6 +430,73 @@ function WorkerProfile({ user, onLogout, authLoading }) {
               </div>
             )}
           </div>
+
+          <div className="form-section">
+  <h2>Supporting Documents</h2>
+
+  <p>
+    Upload certificates, degrees, diplomas, training certificates,
+    licences, or other documents that support your experience.
+  </p>
+
+  <div className="form-group">
+    <label htmlFor="document-type">Document category</label>
+
+    <select
+      id="document-type"
+      value={documentType}
+      onChange={(e) => setDocumentType(e.target.value)}
+      disabled={uploadingDocument}
+    >
+      <option value="certificate">Certificate</option>
+      <option value="degree">Degree</option>
+      <option value="diploma">Diploma</option>
+      <option value="training">Training Certificate</option>
+      <option value="other">Other</option>
+    </select>
+  </div>
+
+  <div className="form-group">
+    <label htmlFor="supporting-document">
+      Upload supporting document
+    </label>
+
+    <input
+      id="supporting-document"
+      type="file"
+      accept=".pdf,.doc,.docx"
+      onChange={handleDocumentUpload}
+      disabled={uploadingDocument}
+    />
+
+    <small>
+      PDF, DOC, or DOCX files only. Maximum size: 10 MB per document.
+    </small>
+  </div>
+
+  {uploadingDocument && (
+    <div className="cv-upload-status">
+      Uploading supporting document...
+    </div>
+  )}
+
+  <div className="uploaded-documents">
+    <h3>Your Uploaded Documents</h3>
+
+    {documents.length === 0 ? (
+      <p>No supporting documents uploaded yet.</p>
+    ) : (
+      documents.map((document) => (
+        <div className="cv-file-display" key={document.id}>
+          <strong>{document.document_name}</strong>
+          <span>
+            {' '}({document.document_type})
+          </span>
+        </div>
+      ))
+    )}
+  </div>
+</div>
 
           <div className="profile-actions">
 

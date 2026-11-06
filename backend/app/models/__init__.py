@@ -136,10 +136,14 @@ class JobDocument:
         duration: str | None = None,
         urgency: JobUrgency = JobUrgency.NORMAL,
         required_skills: list[str] | None = None,
+        required_experience: str | None = None,
+        education_requirements: str | None = None,
+        additional_requirements: list[str] | None = None,
         employment_type: str | None = None,
         closing_date: datetime | None = None,
     ) -> dict[str, Any]:
         now = utc_now()
+
         return {
             "employer_id": employer_id,
             "title": title.strip(),
@@ -151,6 +155,9 @@ class JobDocument:
             "duration": (duration or "").strip() or None,
             "urgency": urgency.value,
             "required_skills": required_skills or [],
+            "required_experience": (required_experience or "").strip() or None,
+            "education_requirements": (education_requirements or "").strip() or None,
+            "additional_requirements": additional_requirements or [],
             "employment_type": (employment_type or "").strip() or None,
             "closing_date": closing_date,
             "status": JobStatus.OPEN.value,
@@ -163,9 +170,13 @@ class JobDocument:
     def to_response(doc_id: str, data: dict[str, Any]) -> dict[str, Any]:
         location_display = data.get("location", "")
         province = data.get("province")
+
         if province:
             abbrev = _province_abbrev(province)
-            location_display = f"{location_display}, {abbrev}" if location_display else abbrev
+            location_display = (
+                f"{location_display}, {abbrev}"
+                if location_display else abbrev
+            )
 
         return {
             "id": doc_id,
@@ -180,6 +191,9 @@ class JobDocument:
             "duration": data.get("duration"),
             "urgency": data.get("urgency"),
             "required_skills": data.get("required_skills", []),
+            "required_experience": data.get("required_experience"),
+            "education_requirements": data.get("education_requirements"),
+            "additional_requirements": data.get("additional_requirements", []),
             "employment_type": data.get("employment_type"),
             "closing_date": data.get("closing_date"),
             "status": data.get("status"),

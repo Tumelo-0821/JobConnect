@@ -103,6 +103,9 @@ class JobService:
             duration=payload.duration,
             urgency=calculate_urgency(payload.closing_date),
             required_skills=payload.required_skills,
+            required_experience=payload.required_experience,
+            education_requirements=payload.education_requirements,
+            additional_requirements=payload.additional_requirements,
             employment_type=payload.employment_type,
             closing_date=payload.closing_date,
         )
