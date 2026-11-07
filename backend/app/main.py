@@ -7,6 +7,7 @@ from app.config import settings
 from app.database import init_firebase
 from app.routers import (
     applications,
+    assistant,
     auth,
     chat,
     employer_stats,
@@ -45,7 +46,7 @@ app.add_middleware(
 
 API_PREFIX = "/api/v1"
 
-
+app.include_router(assistant.router, prefix=API_PREFIX)
 app.include_router(auth.router, prefix=API_PREFIX)
 app.include_router(employers.router, prefix=API_PREFIX)
 app.include_router(jobs.router, prefix=API_PREFIX)

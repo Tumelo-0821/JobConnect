@@ -117,6 +117,20 @@ function mapUser(user) {
 // -------------------- API METHODS --------------------
 
 export const api = {
+
+    // -------------------- JOBCONNECT ASSISTANT --------------------
+
+  async matchAssistantJobs(payload) {
+  const data = typeof payload === 'string'
+    ? { message: payload, language: 'en' }
+    : payload;
+
+  return request('/assistant/match', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+},
+
   // -------------------- AUTHENTICATION --------------------
 
   async register(formData, role, verificationMethod) {

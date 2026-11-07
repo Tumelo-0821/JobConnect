@@ -1277,3 +1277,13 @@
   width: 100%;
   flex-shrink: 0;
 }
+
+/* Assistant job matching additions; existing chat styling retained */
+.assistant-language-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; gap: 12px; border-bottom: 1px solid #eee; font-size: 12px; color: #061626; }
+.assistant-language-row select { max-width: 65%; padding: 6px 9px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #061626; }
+.assistant-job-card { background: #fff; border: 1px solid #e5e5e5; border-left: 3px solid #dab064; border-radius: 10px; padding: 11px; margin: 9px 0; display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: #061626; overflow-wrap: anywhere; }
+.assistant-job-card strong { font-size: 13px; }
+.assistant-job-card small, .assistant-job-card span { color: #555; }
+.assistant-status { color: #555; font-size: 12px; }
+.assistant-error { color: #b91c1c; font-size: 12px; }
+.assistant-input-area button:disabled { opacity: 0.55; cursor: not-allowed; }

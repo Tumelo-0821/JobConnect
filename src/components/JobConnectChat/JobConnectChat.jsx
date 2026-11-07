@@ -26,30 +26,74 @@ function JobConnectChat({ user, employerId, selectedJob }) {
   const [conversationsError, setConversationsError] = useState('');
 
   const [input, setInput] = useState('');
+  const [assistantLanguage, setAssistantLanguage] = useState('en');
+  const [assistantLoading, setAssistantLoading] = useState(false);
+  const [assistantError, setAssistantError] = useState('');
+  const [assistantJobs, setAssistantJobs] = useState([]);
+  const [searchContext, setSearchContext] = useState({ jobType: '', location: '', province: '', noExperience: false });
 
-  function handleSend() {
-    if (!input.trim()) return;
 
-    const userMessage = {
-      sender: 'user',
-      text: input.trim()
-    };
+  async function handleSend() {
+    const query = input.trim();
+    if (!query || assistantLoading) return;
 
-    setMessages(prev => [...prev, userMessage]);
-
-    const response = getAssistantResponse(input);
-
-    setTimeout(() => {
-      setMessages(prev => [
-        ...prev,
-        {
-          sender: 'assistant',
-          text: response
-        }
-      ]);
-    }, 500);
-
+    setMessages(prev => [...prev, { sender: 'user', text: query }]);
     setInput('');
+    setAssistantError('');
+
+    // Keep the worker's answers between messages, without changing My Conversations.
+    const next = { ...searchContext };
+    const jobType = extractJobSearch(query);
+    const location = detectLocation(query);
+    if (jobType) next.jobType = jobType;
+    if (location) {
+      next.location = location.name;
+      next.province = location.province;
+    }
+    if (/\b(no experience|without experience|no previous experience|beginner|entry.level)\b/i.test(query)) {
+      next.noExperience = true;
+    }
+    setSearchContext(next);
+
+    const answer = text => setMessages(prev => [...prev, { sender: 'assistant', text }]);
+    if (/\b(near me|nearby|close to me)\b/i.test(query) && !next.location) {
+      setAssistantJobs([]);
+      answer('Which town or area would you like to work in? I cannot see your location automatically.');
+      return;
+    }
+    if (!next.jobType) {
+      setAssistantJobs([]);
+      answer('What kind of job are you looking for? You can search for any household service posted on JobConnect.');
+      return;
+    }
+    // A location is optional: without one, search all currently open jobs.
+
+    setAssistantJobs([]);
+    setAssistantLoading(true);
+    try {
+      const message = `Find ${next.jobType} jobs${next.location ? ` in ${next.location}` : ''}${next.noExperience ? ' with no experience required' : ''}`;
+      // matchAssistantJobs expects one JSON object; the backend does not accept a plain string.
+      const result = await api.matchAssistantJobs({
+        message,
+        language: assistantLanguage,
+        province: next.province || null,
+        skills: []
+      });
+      const jobs = Array.isArray(result?.jobs) ? result.jobs : [];
+      // No-experience is a strict preference: do not show jobs requiring experience.
+      const eligible = next.noExperience
+        ? jobs.filter(job => !requiresExperience(job.required_experience))
+        : jobs;
+      setAssistantJobs(eligible);
+      answer(eligible.length
+        ? `Here are available ${jobTypeLabel(next.jobType)} jobs ${next.location ? `in ${next.location}` : 'on JobConnect'}. Check each job's exact location and requirements before applying.`
+        : `I couldn't find matching ${jobTypeLabel(next.jobType)} household jobs${next.noExperience ? ' without experience requirements' : ''} ${next.location ? `in ${next.location}` : 'on JobConnect'} right now. You can try another area or job type.`);
+    } catch (error) {
+      console.error('Assistant job search failed:', error);
+      setAssistantError('Unable to search jobs right now. Please try again.');
+    } finally {
+      setAssistantLoading(false);
+    }
   }
 
   function handleKeyDown(event) {
@@ -281,7 +325,20 @@ function JobConnectChat({ user, employerId, selectedJob }) {
                 </div>
               </div>
 
-              <div className="assistant-messages">
+              <div className="assistant-language-row">
+                <label htmlFor="jobconnect-assistant-language">Language</label>
+                <select id="jobconnect-assistant-language" value={assistantLanguage} onChange={event => setAssistantLanguage(event.target.value)}>
+                  <option value="en">English</option>
+                  <option value="zu">isiZulu</option>
+                  <option value="xh">isiXhosa</option>
+                  <option value="nso">Sepedi</option>
+                  <option value="tn">Setswana</option>
+                  <option value="st">Sesotho</option>
+                  <option value="ss">siSwati</option>
+                  <option value="nr">isiNdebele</option>
+                </select>
+              </div>
+              <div className="assistant-messages" aria-live="polite">
                 {messages.map((message, index) => (
                   <div
                     key={index}
@@ -290,6 +347,17 @@ function JobConnectChat({ user, employerId, selectedJob }) {
                     <div className="assistant-message">
                       {message.text}
                     </div>
+                  </div>
+                ))}
+                {assistantLoading && <p className="assistant-status">Searching available jobs...</p>}
+                {assistantError && <p className="assistant-error" role="alert">{assistantError}</p>}
+                {assistantJobs.map(job => (
+                  <div className="assistant-job-card" key={job.id}>
+                    <strong>{job.title || 'Job opportunity'}</strong>
+                    <span>{job.location || job.province || 'Location not specified'}</span>
+                    <span>{job.pay || job.budget || 'Pay not specified'}</span>
+                    {job.required_skills?.length > 0 && <small>Skills: {job.required_skills.join(', ')}</small>}
+                    <small>Review the job requirements before applying.</small>
                   </div>
                 ))}
               </div>
@@ -456,102 +524,48 @@ function JobConnectChat({ user, employerId, selectedJob }) {
   );
 }
 
-function getAssistantResponse(input) {
-  const message = input.toLowerCase().trim();
+// Extract the requested work from any English search, not a fixed occupation list.
+// Location-only replies keep the previous job; a new occupation replaces it.
+function extractJobSearch(text) {
+  let value = String(text || '').toLowerCase().trim();
+  if (/^(yes|no|okay|ok|thanks|thank you|hello|hi)$/.test(value)) return '';
+  // Remove location phrases before finding the requested occupation.
+  value = value.replace(/\b(cosmo(?: city)?|johannesburg|joburg|jozi|jhb|pretoria|tshwane|benoni|boksburg|sandton|germiston|gauteng|cape town|western cape|durban|kwazulu.natal|kzn)\b/gi, ' ');
+  value = value.replace(/\b(i(?:'m| am)?|looking|searching|find|show|need|want|available|any|please|for|me|someone|a|an|the|in|at|near|around|with|work|working|jobs?|positions?|vacancies|opportunities|household|domestic|no|without|previous|experience|required|entry|level)\b/gi, ' ');
+  value = value.replace(/[^a-z0-9 ]/gi, ' ').replace(/\s+/g, ' ').trim();
+  return value;
+}
 
-  const cleaning =
-    message.includes('cleaning') ||
-    message.includes('cleaner') ||
-    message.includes('cleaners');
+function detectLocation(text) {
+  const q = (text || '').toLowerCase();
+  const areas = [
+    ['Cosmo City', 'Gauteng', /\bcosmo(?: city)?\b/],
+    ['Johannesburg', 'Gauteng', /\b(johannesburg|joburg|jozi|jhb)\b/],
+    ['Pretoria', 'Gauteng', /\b(pretoria|tshwane)\b/],
+    ['Benoni', 'Gauteng', /\bbenoni\b/],
+    ['Boksburg', 'Gauteng', /\bboksburg\b/],
+    ['Sandton', 'Gauteng', /\bsandton\b/],
+    ['Germiston', 'Gauteng', /\bgermiston\b/],
+    ['Gauteng', 'Gauteng', /\bgauteng\b/],
+    ['Cape Town', 'Western Cape', /\b(cape town|kaapstad)\b/],
+    ['Western Cape', 'Western Cape', /\bwestern cape\b/],
+    ['Durban', 'KwaZulu-Natal', /\bdurban\b/],
+    ['KwaZulu-Natal', 'KwaZulu-Natal', /\b(kwazulu.natal|kzn)\b/]
+  ];
+  const found = areas.find(([, , pattern]) => pattern.test(q));
+  return found ? { name: found[0], province: found[1] } : null;
+}
 
-  const nanny =
-    message.includes('nanny') ||
-    message.includes('childcare') ||
-    message.includes('babysitter');
+function jobTypeLabel(type) {
+  return type;
+}
 
-  const gardening =
-    message.includes('gardening') ||
-    message.includes('gardener') ||
-    message.includes('garden');
-
-  const caregiving =
-    message.includes('caregiver') ||
-    message.includes('care giving') ||
-    message.includes('elderly care');
-
-  const housekeeping =
-    message.includes('housekeeping') ||
-    message.includes('housekeeper');
-
-  const cooking =
-    message.includes('cooking') ||
-    message.includes('cook');
-
-  const hasJohannesburg =
-    message.includes('johannesburg');
-
-  const hasPretoria =
-    message.includes('pretoria');
-
-  const hasCapeTown =
-    message.includes('cape town');
-
-  const noExperience =
-    message.includes('no experience') ||
-    message.includes('entry') ||
-    message.includes('entry-level') ||
-    message.includes('beginner') ||
-    message.includes('graduate');
-
-  if (cleaning) {
-    if (hasJohannesburg) {
-      return 'Great! I can help you find domestic cleaning jobs in Johannesburg. Do you have previous cleaning experience?';
-    }
-
-    if (hasPretoria) {
-      return 'Great! I can help you find domestic cleaning jobs in Pretoria. Do you have previous cleaning experience?';
-    }
-
-    if (hasCapeTown) {
-      return 'Great! I can help you find domestic cleaning jobs in Cape Town. Do you have previous cleaning experience?';
-    }
-
-    return 'Great! I can help you find domestic cleaning jobs. Which location are you looking for?';
-  }
-
-  if (nanny) {
-    return 'I can help you find domestic nanny and childcare jobs. Which location are you looking for, and do you have previous childcare experience?';
-  }
-
-  if (gardening) {
-    return 'I can help you find domestic gardening jobs. Which location are you looking for, and do you have previous gardening experience?';
-  }
-
-  if (caregiving) {
-    return 'I can help you find domestic caregiving opportunities. Which location are you looking for, and do you have previous caregiving experience?';
-  }
-
-  if (housekeeping) {
-    return 'I can help you find domestic housekeeping jobs. Which location are you looking for, and do you have previous housekeeping experience?';
-  }
-
-  if (cooking) {
-    return 'I can help you find domestic cooking jobs. Which location are you looking for, and do you have previous cooking experience?';
-  }
-
-  if (noExperience) {
-    return 'That is okay! JobConnect can help you find domestic jobs that do not require previous experience. What type of work are you interested in?';
-  }
-
-  if (hasJohannesburg || hasPretoria || hasCapeTown) {
-    return 'I can help you search for domestic jobs in that location. What type of work are you interested in?';
-  }
-
-  if (message.includes('help')) {
-    return 'I can help you search for domestic jobs such as cleaning, nanny work, gardening, caregiving, housekeeping and cooking. You can also tell me your location and experience level.';
-  }
-
-  return 'I would be happy to help! Tell me what type of domestic job you are looking for, your experience level and your preferred location.';
+function requiresExperience(value) {
+  if (!value) return false;
+  const v = String(value).trim().toLowerCase();
+  if (/^(none|no|not required|no experience|0|0 years?|entry.level)$/.test(v)) return false;
+  // Unknown wording should not be presented as verified entry-level work.
+  return true;
 }
 
 export default JobConnectChat;
