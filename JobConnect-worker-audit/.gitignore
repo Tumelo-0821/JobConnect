@@ -1,0 +1,8 @@
+node_modules/
+build/
+.env
+.cache/
+firebase-service-account.json
+__pycache__/
+*.pyc
+uploads/

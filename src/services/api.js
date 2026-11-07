@@ -1,5 +1,5 @@
-const API_BASE =
-  process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1';
+const API_URL =
+  process.env.REACT_APP_API_URL ||"http://localhost:8000/api/v1";
 
 const TOKEN_KEY = 'jobconnect_token';
 const USER_KEY = 'jobconnect_user';

@@ -1,0 +1,708 @@
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\models\__init__.py:283: message: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\models\__init__.py:293: "message": message,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\models\__init__.py:310: "message": data.get("message"),
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\models\__init__.py:317: class ConversationDocument:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\models\__init__.py:318: """Firestore conversation document shape."""
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\models\__init__.py:349: class MessageDocument:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\models\__init__.py:350: """Firestore chat message document shape."""
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\models\__init__.py:355: conversation_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\models\__init__.py:357: message: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\models\__init__.py:362: "conversation_id": conversation_id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\models\__init__.py:364: "message": message.strip(),
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\models\__init__.py:376: "conversation_id": data.get("conversation_id"),
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\models\__init__.py:378: "message": data.get("message"),
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:7: from app.models import ConversationDocument, MessageDocument, new_id, utc_now
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:10: class FirestoreChatRepository:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:12: Firestore repository for conversations and chat messages.
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:16: conversations/
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:17: conversation_id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:23: messages/
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:24: message_id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:25: conversation_id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:27: message
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:33: def conversations_collection(self):
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:34: return get_firestore().collection("conversations")
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:37: def messages_collection(self):
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:38: return get_firestore().collection("messages")
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:41: # CONVERSATIONS
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:44: def create_conversation(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:50: conversation_id = new_id()
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:52: conversation = ConversationDocument.create(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:57: self.conversations_collection.document(conversation_id).set(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:58: conversation
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:61: return conversation_id, conversation.copy()
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:63: def get_conversation(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:65: conversation_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:68: doc = self.conversations_collection.document(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:69: conversation_id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:77: def get_conversation_between_users(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:84: self.conversations_collection
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:112: # MESSAGES
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:115: def create_message(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:117: conversation_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:119: message: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:122: conversation = self.get_conversation(conversation_id)
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:124: if not conversation:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:125: raise KeyError("Conversation not found")
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:127: message_id = new_id()
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:129: message_data = MessageDocument.create(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:130: conversation_id=conversation_id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:132: message=message,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:135: self.messages_collection.document(message_id).set(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:136: message_data
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:139: # Update conversation's last activity
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:140: self.conversations_collection.document(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:141: conversation_id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:148: return message_id, message_data.copy()
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:150: def get_message(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:152: message_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:155: doc = self.messages_collection.document(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:156: message_id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:164: def list_messages(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:166: conversation_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:170: self.messages_collection
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:173: "conversation_id",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:175: conversation_id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:198: def mark_message_as_read(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:200: message_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:203: ref = self.messages_collection.document(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:204: message_id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:208: raise KeyError("Message not found")
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:218: def mark_conversation_messages_as_read(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:220: conversation_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:224: messages = self.list_messages(conversation_id)
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:228: for message_id, data in messages:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:230: # Only mark messages sent by the other person as read
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:235: ref = self.messages_collection.document(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:236: message_id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:249: # CONVERSATION LIST
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:252: def list_conversations_for_user(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:257: employer_query = self.conversations_collection.where(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:265: worker_query = self.conversations_collection.where(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:273: conversations: dict[str, dict[str, Any]] = {}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:276: conversations[doc.id] = doc.to_dict()
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:279: conversations[doc.id] = doc.to_dict()
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\chat_repository.py:281: results = list(conversations.items())
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:6: class ChatRepository(Protocol):
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:7: def create_conversation(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:13: def get_conversation(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:15: conversation_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:18: def get_conversation_between_users(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:24: def create_message(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:26: conversation_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:28: message: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:31: def get_message(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:33: message_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:36: def list_messages(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:38: conversation_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:41: def mark_message_as_read(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:43: message_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:46: def mark_conversation_messages_as_read(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:48: conversation_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:52: def list_conversations_for_user(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:513: class InMemoryChatRepository:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:515: self._conversations: dict[str, dict[str, Any]] = {}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:516: self._messages: dict[
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:522: self._conversations.clear()
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:523: self._messages.clear()
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:525: def create_conversation(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:530: from app.models import ConversationDocument, new_id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:532: conversation_id = new_id()
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:534: conversation = ConversationDocument.create(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:539: self._conversations[conversation_id] = conversation
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:540: self._messages[conversation_id] = {}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:542: return conversation_id, conversation.copy()
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:544: def get_conversation(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:546: conversation_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:548: data = self._conversations.get(conversation_id)
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:553: return conversation_id, data.copy()
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:555: def get_conversation_between_users(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:560: for conversation_id, data in self._conversations.items():
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:565: return conversation_id, data.copy()
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:569: def add_message(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:571: conversation_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:573: message: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:575: from app.models import MessageDocument, new_id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:577: if conversation_id not in self._conversations:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:578: raise KeyError("Conversation not found")
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:580: message_id = new_id()
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:582: message_data = MessageDocument.create(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:583: conversation_id=conversation_id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:585: message=message,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:588: self._messages.setdefault(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:589: conversation_id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:591: )[message_id] = message_data
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:593: self._conversations[conversation_id]["updated_at"] = utc_now()
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:595: return message_id, message_data.copy()
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:597: def list_messages(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:599: conversation_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:601: if conversation_id not in self._conversations:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:602: raise KeyError("Conversation not found")
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:604: messages = [
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:605: (message_id, message.copy())
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:606: for message_id, message in self._messages.get(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:607: conversation_id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:612: messages.sort(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\memory.py:616: return messages
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\notification_repository.py:22: message: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\repositories\notification_repository.py:31: message=message,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:4: get_chat_repository,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:8: from app.repositories.memory import ChatRepository, UserRepository
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:9: from app.schemas.chat import (
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:10: ConversationResponse,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:11: MessageCreate,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:12: MessageResponse,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:14: from app.services.chat_service import ChatService
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:18: prefix="/chat",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:19: tags=["Chat"],
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:23: def get_chat_service(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:24: chat_repo: ChatRepository = Depends(get_chat_repository),
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:26: ) -> ChatService:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:27: return ChatService(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:28: chat_repo=chat_repo,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:34: # CONVERSATIONS
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:39: "/conversations",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:40: response_model=list[ConversationResponse],
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:41: summary="List my conversations",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:43: def list_conversations(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:45: chat_service: ChatService = Depends(get_chat_service),
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:46: ) -> list[ConversationResponse]:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:48: return chat_service.list_conversations(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:54: "/conversations/{user_id}",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:55: response_model=ConversationResponse,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:57: summary="Get or create a conversation",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:59: def get_or_create_conversation(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:62: chat_service: ChatService = Depends(get_chat_service),
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:63: ) -> ConversationResponse:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:65: return chat_service.get_or_create_conversation(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:72: "/conversations/{conversation_id}",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:73: response_model=ConversationResponse,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:74: summary="Get a conversation",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:76: def get_conversation(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:77: conversation_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:79: chat_service: ChatService = Depends(get_chat_service),
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:80: ) -> ConversationResponse:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:82: return chat_service.get_conversation(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:84: conversation_id=conversation_id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:89: # MESSAGES
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:94: "/conversations/{conversation_id}/messages",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:95: response_model=list[MessageResponse],
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:96: summary="Get conversation messages",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:98: def list_messages(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:99: conversation_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:101: chat_service: ChatService = Depends(get_chat_service),
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:102: ) -> list[MessageResponse]:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:104: return chat_service.list_messages(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:106: conversation_id=conversation_id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:111: "/conversations/{conversation_id}/messages",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:112: response_model=MessageResponse,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:114: summary="Send a message",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:116: def send_message(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:117: conversation_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:118: payload: MessageCreate,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:120: chat_service: ChatService = Depends(get_chat_service),
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:121: ) -> MessageResponse:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:123: return chat_service.send_message(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:125: conversation_id=conversation_id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:126: message=payload.message,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:136: "/messages/{message_id}/read",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:137: response_model=MessageResponse,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:138: summary="Mark a message as read",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:140: def mark_message_as_read(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:141: message_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:143: chat_service: ChatService = Depends(get_chat_service),
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:144: ) -> MessageResponse:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:146: return chat_service.mark_message_as_read(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:148: message_id=message_id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:153: "/conversations/{conversation_id}/read",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:155: summary="Mark conversation messages as read",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:157: def mark_conversation_as_read(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:158: conversation_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:160: chat_service: ChatService = Depends(get_chat_service),
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:163: chat_service.mark_conversation_as_read(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\chat.py:165: conversation_id=conversation_id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\jobs.py:11: from app.schemas.auth import MessageResponse
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\jobs.py:96: response_model=MessageResponse,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\jobs.py:103: ) -> MessageResponse:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\jobs.py:105: return MessageResponse(message="Job deleted successfully")
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\work_reviews.py:73: "message": "Work has already been marked as completed",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\work_reviews.py:92: "message": "Work marked as completed successfully",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\routers\work_reviews.py:188: "message": "Worker review submitted successfully",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\schemas\application.py:42: rejection_message: str | None = None
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\schemas\auth.py:23: class MessageResponse(BaseModel):
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\schemas\auth.py:24: message: str
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\schemas\chat.py:6: class ConversationResponse(BaseModel):
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\schemas\chat.py:14: class MessageCreate(BaseModel):
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\schemas\chat.py:15: message: str = Field(..., min_length=1, max_length=2000)
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\schemas\chat.py:18: class MessageResponse(BaseModel):
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\schemas\chat.py:20: conversation_id: str
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\schemas\chat.py:22: message: str
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\schemas\chat.py:27: class ConversationWithMessagesResponse(BaseModel):
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\schemas\chat.py:28: conversation: ConversationResponse
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\schemas\chat.py:29: messages: list[MessageResponse]
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\schemas\notification.py:21: message: str
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\schemas\__init__.py:5: MessageResponse,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\schemas\__init__.py:19: "MessageResponse",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\application_service.py:92: message=(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\application_service.py:253: rejection_message = (payload.rejection_message or "").strip()
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\application_service.py:255: if new_status == "rejected" and not rejection_message:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\application_service.py:258: detail="Please provide a rejection message",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\application_service.py:285: update_data["rejection_message"] = rejection_message
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\application_service.py:295: message=(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\application_service.py:308: message=(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\application_service.py:311: f"Employer message:\n{rejection_message}"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\auth_service.py:136: "message": "Verification code sent. Check your selected contact method.",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\auth_service.py:276: "message": "A new verification code was requested.",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:3: from app.models import ConversationDocument, MessageDocument
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:4: from app.repositories.memory import ChatRepository, UserRepository
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:5: from app.schemas.chat import (
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:6: ConversationResponse,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:7: MessageResponse,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:11: class ChatService:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:14: chat_repo: ChatRepository,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:17: self.chat_repo = chat_repo
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:21: # CONVERSATION
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:24: def get_or_create_conversation(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:28: ) -> ConversationResponse:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:46: # Only employer <-> worker conversations are allowed
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:53: detail="Employers can only chat with workers",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:63: detail="Workers can only chat with employers",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:76: # Check whether conversation already exists
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:79: existing = self.chat_repo.get_conversation_between_users(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:85: conversation_id, conversation_data = existing
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:87: return ConversationResponse(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:88: **ConversationDocument.to_response(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:89: conversation_id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:90: conversation_data,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:95: # Create new conversation
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:98: conversation_id, conversation_data = (
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:99: self.chat_repo.create_conversation(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:105: return ConversationResponse(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:106: **ConversationDocument.to_response(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:107: conversation_id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:108: conversation_data,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:113: # GET CONVERSATION
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:116: def get_conversation(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:119: conversation_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:120: ) -> ConversationResponse:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:122: result = self.chat_repo.get_conversation(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:123: conversation_id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:129: detail="Conversation not found",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:132: conversation_id, data = result
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:134: self._verify_conversation_access(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:139: return ConversationResponse(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:140: **ConversationDocument.to_response(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:141: conversation_id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:147: # SEND MESSAGE
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:150: def send_message(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:153: conversation_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:154: message: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:155: ) -> MessageResponse:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:157: result = self.chat_repo.get_conversation(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:158: conversation_id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:164: detail="Conversation not found",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:167: _, conversation_data = result
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:169: self._verify_conversation_access(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:171: conversation_data,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:174: message = message.strip()
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:176: if not message:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:179: detail="Message cannot be empty",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:182: message_id, message_data = (
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:183: self.chat_repo.create_message(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:184: conversation_id=conversation_id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:186: message=message,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:190: return MessageResponse(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:191: **MessageDocument.to_response(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:192: message_id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:193: message_data,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:198: # GET MESSAGES
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:201: def list_messages(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:204: conversation_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:205: ) -> list[MessageResponse]:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:207: result = self.chat_repo.get_conversation(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:208: conversation_id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:214: detail="Conversation not found",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:217: _, conversation_data = result
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:219: self._verify_conversation_access(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:221: conversation_data,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:224: messages = self.chat_repo.list_messages(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:225: conversation_id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:229: MessageResponse(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:230: **MessageDocument.to_response(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:231: message_id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:235: for message_id, data in messages
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:239: # MARK MESSAGE AS READ
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:242: def mark_message_as_read(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:245: message_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:246: ) -> MessageResponse:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:248: message_result = self.chat_repo.get_message(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:249: message_id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:252: if not message_result:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:255: detail="Message not found",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:258: _, message_data = message_result
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:260: conversation_id = message_data.get(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:261: "conversation_id"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:264: if not conversation_id:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:267: detail="Message has no conversation",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:270: conversation_result = (
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:271: self.chat_repo.get_conversation(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:272: conversation_id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:276: if not conversation_result:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:279: detail="Conversation not found",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:282: _, conversation_data = conversation_result
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:284: self._verify_conversation_access(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:286: conversation_data,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:289: updated = self.chat_repo.mark_message_as_read(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:290: message_id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:293: return MessageResponse(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:294: **MessageDocument.to_response(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:295: message_id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:301: # MARK CONVERSATION AS READ
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:304: def mark_conversation_as_read(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:307: conversation_id: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:310: result = self.chat_repo.get_conversation(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:311: conversation_id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:317: detail="Conversation not found",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:320: _, conversation_data = result
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:322: self._verify_conversation_access(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:324: conversation_data,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:327: self.chat_repo.mark_conversation_messages_as_read(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:328: conversation_id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:333: # LIST USER CONVERSATIONS
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:336: def list_conversations(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:339: ) -> list[ConversationResponse]:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:341: conversations = (
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:342: self.chat_repo.list_conversations_for_user(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:348: ConversationResponse(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:349: **ConversationDocument.to_response(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:350: conversation_id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:354: for conversation_id, data in conversations
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:361: def _verify_conversation_access(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:364: conversation_data: dict,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:369: employer_id = conversation_data.get(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:373: worker_id = conversation_data.get(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\chat_service.py:383: detail="You do not have access to this conversation",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\cv_service.py:73: "message": "CV uploaded successfully",
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\job_service.py:138: message=(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\notification_service.py:25: message: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\notification_service.py:34: message=message,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\notification_service.py:43: message=message,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\otp_delivery_service.py:3: from email.message import EmailMessage
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\otp_delivery_service.py:31: message = EmailMessage()
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\otp_delivery_service.py:32: message["Subject"] = "Your JobConnect verification code"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\otp_delivery_service.py:33: message["From"] = settings.email_from
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\otp_delivery_service.py:34: message["To"] = recipient
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\otp_delivery_service.py:35: message.set_content(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\otp_delivery_service.py:54: server.send_message(message)
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\otp_delivery_service.py:73: message = (
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\otp_delivery_service.py:86: "messages": [
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\otp_delivery_service.py:88: "content": message,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\otp_delivery_service.py:102: "The SMS provider rejected the message. Please try again later."
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\otp_service.py:22: message = f"{challenge_id}:{otp}".encode("utf-8")
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\otp_service.py:24: return hmac.new(secret, message, hashlib.sha256).hexdigest()
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\sms_service.py:34: message: str,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\sms_service.py:72: sms_body = f"{title}\n\n{message}"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\services\sms_service.py:75: "messages": [
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\config.py:43: smsportal_url: str = "https://rest.smsportal.com/bulkmessages"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\dependencies.py:7: from app.repositories.memory import UserRepository, ChatRepository
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\dependencies.py:18: _chat_repo: ChatRepository | None = None
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\dependencies.py:118: def get_chat_repository() -> ChatRepository:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\dependencies.py:119: if _chat_repo is not None:
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\dependencies.py:120: return _chat_repo
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\dependencies.py:122: from app.repositories.chat_repository import FirestoreChatRepository
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\dependencies.py:124: return FirestoreChatRepository()
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\main.py:11: chat,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\backend\app\main.py:58: app.include_router(chat.router, prefix=API_PREFIX)
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:3: import './JobConnectChat.css';
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:5: function JobConnectChat({ user }) {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:9: const [messages, setMessages] = useState([
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:22: const userMessage = {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:27: setMessages(prev => [...prev, userMessage]);
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:32: setMessages(prev => [
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:54: function openConversations() {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:55: setActiveView('conversations');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:68: className="jobconnect-chat-button"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:70: aria-label="Open JobConnect Chat"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:77: <div className="jobconnect-chat-widget">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:79: <div className="jobconnect-chat-header">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:80: <div className="chat-header-info">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:84: className="chat-back-button"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:92: <div className="chat-header-icon">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:98: <span>Chat</span>
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:103: className="chat-close-button"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:105: aria-label="Close chat"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:112: <div className="chat-home">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:114: <div className="chat-welcome">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:127: className="chat-option"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:141: className="chat-option"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:142: onClick={openConversations}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:144: <div className="option-icon conversation-icon">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:149: <strong>My Conversations</strong>
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:150: <span>Chat with employers or workers</span>
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:171: <div className="assistant-messages">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:172: {messages.map((message, index) => (
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:175: className={`assistant-message-row ${message.sender}`}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:177: <div className="assistant-message">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:178: {message.text}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:231: {activeView === 'conversations' && (
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:232: <div className="conversations-view">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:234: <div className="conversation-empty">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:235: <div className="conversation-empty-icon">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:239: <h4>Your conversations</h4>
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:242: Conversations with employers and workers will appear here.
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:246: onClick={() => window.location.href = '/chat'}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:248: Open Chat
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:262: const message = input.toLowerCase().trim();
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:265: message.includes('cleaning') ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:266: message.includes('cleaner') ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:267: message.includes('cleaners');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:270: message.includes('nanny') ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:271: message.includes('childcare') ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:272: message.includes('babysitter');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:275: message.includes('gardening') ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:276: message.includes('gardener') ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:277: message.includes('garden');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:280: message.includes('caregiver') ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:281: message.includes('care giving') ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:282: message.includes('elderly care');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:285: message.includes('housekeeping') ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:286: message.includes('housekeeper');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:289: message.includes('cooking') ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:290: message.includes('cook');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:293: message.includes('johannesburg');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:296: message.includes('pretoria');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:299: message.includes('cape town');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:302: message.includes('no experience') ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:303: message.includes('entry') ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:304: message.includes('entry-level') ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:305: message.includes('beginner') ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:306: message.includes('graduate');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:352: if (message.includes('help')) {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\JobConnectChat\JobConnectChat.jsx:359: export default JobConnectChat;
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\Navbar\Navbar.jsx:210: <Link to="/chat">Messages</Link>
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\Navbar\Navbar.jsx:312: <div className="notification-message">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\Navbar\Navbar.jsx:313: {notification.message}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\Navbar\Navbar.jsx:445: <a onClick={() => handleNavClick('/chat')}>
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\components\Navbar\Navbar.jsx:446: ?? Messages
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Auth\LoginPage.jsx:33: setError(err.message || 'Login failed. Please try again.');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Auth\LoginPage.jsx:69: <strong>Direct Chat</strong>
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Auth\LoginPage.jsx:70: <span>Message workers instantly</span>
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Auth\RegisterPage.jsx:96: err.message || 'Could not start registration. Please try again.'
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Auth\RegisterPage.jsx:328: : 'Enter your phone number above to receive a text message.'}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Auth\VerifyOtpPage.jsx:20: const [message, setMessage] = useState('');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Auth\VerifyOtpPage.jsx:45: setMessage('');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Auth\VerifyOtpPage.jsx:59: setMessage('Verified successfully. Your account has been created.');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Auth\VerifyOtpPage.jsx:68: setError(err.message || 'Verification failed. Please try again.');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Auth\VerifyOtpPage.jsx:76: setMessage('');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Auth\VerifyOtpPage.jsx:81: setMessage(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Auth\VerifyOtpPage.jsx:82: result?.message || 'If the request was accepted, a new code has been requested.'
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Auth\VerifyOtpPage.jsx:86: setError(err.message || 'Could not request another code.');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Auth\VerifyOtpPage.jsx:135: {message && (
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Auth\VerifyOtpPage.jsx:137: {message}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:5: import './Chat.css';
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:7: function ChatPage({ user, onLogout }) {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:10: const { id, workerId, userId, conversationId } = useParams();
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:14: const [conversation, setConversation] = useState(null);
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:15: const [messages, setMessages] = useState([]);
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:16: const [message, setMessage] = useState('');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:22: const messagesEndRef = useRef(null);
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:35: // LOAD CONVERSATION
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:43: async function loadConversation() {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:48: let conversationData;
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:50: // If a conversation ID was supplied, load it directly.
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:51: if (conversationId) {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:52: conversationData = await api.getConversation(conversationId);
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:54: // Otherwise get/create a conversation with the other user.
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:57: 'No user was specified for this conversation.'
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:61: conversationData =
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:62: await api.getOrCreateConversation(otherUserId);
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:67: setConversation(conversationData);
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:69: // Load messages.
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:70: const messageData = await api.getMessages(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:71: conversationData.id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:76: setMessages(messageData || []);
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:78: // Mark incoming messages as read.
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:80: await api.markConversationAsRead(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:81: conversationData.id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:85: 'Could not mark messages as read:',
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:90: console.error('Failed to load chat:', err);
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:94: err.message ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:95: 'Unable to load this conversation.'
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:105: loadConversation();
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:110: }, [user, otherUserId, conversationId]);
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:113: // REFRESH MESSAGES
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:117: if (!conversation?.id) return;
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:121: const messageData = await api.getMessages(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:122: conversation.id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:125: setMessages(messageData || []);
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:128: 'Could not refresh messages:',
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:135: }, [conversation?.id]);
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:142: messagesEndRef.current?.scrollIntoView({
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:145: }, [messages]);
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:148: // SEND MESSAGE
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:151: async function handleSendMessage(e) {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:154: const trimmedMessage = message.trim();
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:157: !trimmedMessage ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:158: !conversation ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:168: const newMessage = await api.sendMessage(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:169: conversation.id,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:170: trimmedMessage
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:173: setMessages((prev) => [
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:175: newMessage,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:178: setMessage('');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:181: 'Failed to send message:',
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:186: err.message ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:187: 'Unable to send your message.'
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:198: function formatMessageTime(timestamp) {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:218: if (!conversation || !user) {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:222: return conversation.employer_id === user.id
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:249: <div className="chat-page">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:255: <div className="chat-container">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:256: <div className="chat-loading">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:257: Loading conversation...
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:269: <div className="chat-page">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:275: <div className="chat-container">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:277: {/* CHAT HEADER */}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:278: <div className="chat-header">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:281: className="chat-back-btn"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:289: <div className="chat-user-avatar">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:295: <div className="chat-user-info">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:309: <div className="chat-error">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:314: {/* MESSAGES */}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:315: <div className="chat-messages">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:317: {messages.length === 0 ? (
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:318: <div className="chat-welcome">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:320: <div className="chat-empty-icon">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:325: Start a conversation
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:336: messages.map((msg) => {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:344: className={`message-row ${
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:346: ? 'message-mine'
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:347: : 'message-theirs'
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:351: <div className="message-bubble">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:354: {msg.message}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:357: <span className="message-time">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:358: {formatMessageTime(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:370: <div ref={messagesEndRef} />
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:374: {/* MESSAGE INPUT */}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:376: className="chat-input-area"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:377: onSubmit={handleSendMessage}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:382: placeholder="Type your message..."
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:383: value={message}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:385: setMessage(e.target.value)
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:394: !message.trim() ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:395: !conversation ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Chat\ChatPage.jsx:409: export default ChatPage;
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:33: const [rejectionMessage, setRejectionMessage] = useState('');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:41: const [reviewMessage, setReviewMessage] = useState('');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:96: setError(err.message || 'Failed to load employer jobs');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:164: setReviewMessage('');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:171: setError(err.message || 'Failed to update application');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:180: const message = rejectionMessage.trim();
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:182: if (!message) {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:195: message
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:200: setRejectionMessage('');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:203: setError(err.message || 'Failed to reject application.');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:217: setError(err.message || 'Failed to open CV.');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:236: setError(err.message || 'Failed to download CV.');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:249: setReviewMessage('');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:256: setReviewMessage(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:261: setError(err.message || 'Failed to mark work as completed.');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:278: setReviewMessage('');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:291: setReviewMessage(
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:296: setError(err.message || 'Failed to submit the review.');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:310: setError(err.message || 'Failed to close job');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:382: {reviewMessage && (
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:393: {reviewMessage}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:497: className="chat-job-btn"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:500: ?? Chat
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:580: setRejectionMessage('');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:665: <div className="no-cv-message">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:781: className="shortlist-chat-btn"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:782: onClick={() => navigate(`/chat/${worker.id}`)}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:784: ?? Chat
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:875: className="shortlist-chat-btn"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:876: onClick={() => navigate(`/chat/${application.worker_id}`)}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:878: ?? Chat
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:883: className="shortlist-chat-btn"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:940: className="shortlist-chat-btn"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:944: setReviewMessage('');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:1050: className="shortlist-chat-btn"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:1088: tip: 'Chat before hiring to discuss the job',
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:1140: setRejectionMessage('');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:1152: <label htmlFor="rejection-message" className="rejection-label">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:1157: id="rejection-message"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:1161: value={rejectionMessage}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:1162: onChange={event => setRejectionMessage(event.target.value)}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:1166: This message will be sent to the worker with their rejection notification.
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:1175: setRejectionMessage('');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\EmployerDashboard\EmployerDashboard.jsx:1187: disabled={rejecting || !rejectionMessage.trim()}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\JobPost\PostJobPage.jsx:107: setError(err.message || 'Failed to post job');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Jobs\JobsPage.jsx:163: err.message ||
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Jobs\JobsPage.jsx:323: <div className="jobs-message" role="status">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Jobs\JobsPage.jsx:330: <div className="jobs-message jobs-error" role="alert">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Jobs\JobsPage.jsx:343: <div className="jobs-message">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\LandingPage\LandingPage.jsx:183: Apply for jobs or hire a worker with one click. Chat directly in the app,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\LandingPage\LandingPage.jsx:299: <span className="label">Direct Chat</span>
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Verification\VerificationPage.jsx:62: setError(err.message || 'Verification failed. Please try again.');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\WorkerDashboard\WorkerDashboard.jsx:88: setError(err.message || 'Failed to load dashboard data');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\WorkerDashboard\WorkerDashboard.jsx:139: setError(err.message || 'Failed to apply for job');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\WorkerDashboard\WorkerDashboard.jsx:286: className="chat-negotiate-btn"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\WorkerDashboard\WorkerDashboard.jsx:288: title="Chat and pay negotiation are not available yet"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\WorkerDashboard\WorkerDashboard.jsx:290: ?? Chat &amp; Negotiate
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\WorkerDashboard\WorkerDashboard.jsx:528: onClick={() => navigate(`/chat/${app.employer_id}`)}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\WorkerDashboard\WorkerDashboard.jsx:539: ?? Message Employer
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\WorkerProfile\WorkerProfile.jsx:24: const [message, setMessage] = useState('');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\WorkerProfile\WorkerProfile.jsx:64: setMessage('');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\WorkerProfile\WorkerProfile.jsx:73: setMessage('');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\WorkerProfile\WorkerProfile.jsx:100: setMessage('CV uploaded successfully.');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\WorkerProfile\WorkerProfile.jsx:102: setError(err.message || 'Failed to upload CV.');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\WorkerProfile\WorkerProfile.jsx:113: setMessage('');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\WorkerProfile\WorkerProfile.jsx:131: setMessage('Profile updated successfully.');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\WorkerProfile\WorkerProfile.jsx:137: setError(err.message || 'Failed to update profile.');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\WorkerProfile\WorkerProfile.jsx:176: {message && (
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\WorkerProfile\WorkerProfile.jsx:178: ? {message}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Workers\WorkersPage.jsx:149: err.message === 'Failed to fetch'
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Workers\WorkersPage.jsx:151: : err.message || 'Could not load workers.'
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Workers\WorkersPage.jsx:342: <div className="workers-message" role="status">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Workers\WorkersPage.jsx:349: <div className="workers-message workers-error" role="alert">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\pages\Workers\WorkersPage.jsx:362: <div className="workers-message">
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:73: let message = 'Request failed';
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:77: message = data.detail;
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:79: message = data.detail
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:88: throw new Error(message);
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:257: rejectionMessage = null
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:265: rejection_message: rejectionMessage,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:317: let message = 'Failed to retrieve CV';
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:323: message =
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:332: throw new Error(message);
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:413: // CHAT
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:416: async getConversations() {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:417: return request('/chat/conversations');
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:420: async getOrCreateConversation(userId) {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:421: return request(`/chat/conversations/${userId}`, {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:426: async getConversation(conversationId) {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:427: return request(`/chat/conversations/${conversationId}`);
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:430: async getMessages(conversationId) {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:432: `/chat/conversations/${conversationId}/messages`
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:436: async sendMessage(conversationId, message) {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:438: `/chat/conversations/${conversationId}/messages`,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:442: message,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:448: async markMessageAsRead(messageId) {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:449: return request(`/chat/messages/${messageId}/read`, {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:454: async markConversationAsRead(conversationId) {
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api.js:456: `/chat/conversations/${conversationId}/read`,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api_before_otp.js:60: let message = 'Request failed';
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api_before_otp.js:64: message = data.detail;
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api_before_otp.js:66: message = data.detail
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api_before_otp.js:75: throw new Error(message);
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api_before_otp.js:182: let message = 'Failed to retrieve CV';
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api_before_otp.js:188: message = data.detail;
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api_before_otp.js:194: throw new Error(message);
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api_before_otp.js:218: rejectionMessage = null
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\services\api_before_otp.js:226: rejection_message: rejectionMessage,
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\App.jsx:20: import ChatPage from './pages/Chat/ChatPage';
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\App.jsx:250: {/* CHAT */}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\App.jsx:253: path="/chat"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\App.jsx:254: element={<ChatPage {...sharedProps} />}
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\App.jsx:258: path="/chat/:id"
+C:\Users\Abigail Skosana\Downloads\JobConnect-main\Jobconnect-main\src\App.jsx:259: element={<ChatPage {...sharedProps} />}
