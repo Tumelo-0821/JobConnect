@@ -53,7 +53,7 @@ async function request(path, options = {}) {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE}${path}`, {
+  const response = await fetch(`${API_URL}${path}`, {
     ...options,
     headers,
   });
@@ -326,7 +326,7 @@ async getATSShortlist(jobId, limit = 5) {
     const token = getToken();
 
     const response = await fetch(
-      `${API_BASE}/employers/jobs/${jobId}/applications/${applicationId}/cv`,
+      `${API_URL}/employers/jobs/${jobId}/applications/${applicationId}/cv`,
       {
         method: 'GET',
         headers: token
@@ -374,7 +374,7 @@ async getATSShortlist(jobId, limit = 5) {
     const token = getToken();
 
     const response = await fetch(
-      `${API_BASE}/employers/jobs/${jobId}/applications/${applicationId}/documents/${documentId}`,
+      `${API_URL}/employers/jobs/${jobId}/applications/${applicationId}/documents/${documentId}`,
       {
         method: 'GET',
         headers: token
